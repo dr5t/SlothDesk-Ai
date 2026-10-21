@@ -1,0 +1,59 @@
+export type SupportedFileType = "text" | "markdown" | "csv" | "json" | "unsupported";
+
+export interface FileRecord {
+  path: string;
+  relativePath: string;
+  name: string;
+  type: SupportedFileType;
+  size: number;
+  hash: string;
+  duplicateOf?: string;
+}
+
+export interface Proposal {
+  id: string;
+  sourcePath: string;
+  destinationPath: string;
+  reason: string;
+  status: "pending" | "approved" | "rejected" | "completed" | "failed";
+}
+
+export interface DocumentReport {
+  source: string;
+  summary: string;
+  facts: string[];
+  tasks: string[];
+  decisions: string[];
+  deadlines: string[];
+  category: string;
+  suggestedName: string;
+  provider: "ollama" | "deterministic";
+}
+
+export interface Execution {
+  id: string;
+  workspace: string;
+  status: "completed" | "failed";
+  startedAt: string;
+  endedAt: string;
+  filesProcessed: number;
+  duplicates: number;
+  tasksExtracted: number;
+  proposals: Proposal[];
+  reports: DocumentReport[];
+  errors: string[];
+  manualMinutes: number;
+  automatedMinutes: number;
+  reviewMinutes: number;
+  estimatedNetMinutesSaved: number;
+}
+
+export interface OperationJournalEntry {
+  id: string;
+  proposalId: string;
+  executionId: string;
+  sourcePath: string;
+  destinationPath: string;
+  completedAt: string;
+  rolledBackAt?: string;
+}

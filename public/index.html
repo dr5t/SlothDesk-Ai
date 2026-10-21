@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SlothDesk AI — Do less busywork</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/"><span class="brand-mark">S</span> SLOTHDESK <em>AI</em></a><span class="mode">LOCAL-FIRST / OPEN-WEIGHT</span></header>
+  <main>
+    <section class="hero">
+      <div class="eyebrow">PRODUCTIVITY AUTOMATION WORKBENCH</div>
+      <h1>Let the busywork<br><span>move slower.</span></h1>
+      <p class="lede">SlothDesk turns a folder of scattered notes, documents, and datasets into a reviewable action plan — with local Gemma inference when Ollama is available.</p>
+      <a class="button primary" href="#workspace">Open workspace <span>↘</span></a>
+    </section>
+    <section class="stats"><div><strong>01</strong><span>Scan only what you authorize</span></div><div><strong>02</strong><span>Review before anything moves</span></div><div><strong>03</strong><span>Measure the time you get back</span></div></section>
+    <section id="workspace" class="workspace">
+      <div class="section-head"><div><div class="eyebrow">LAZY CLEANUP / WORKFLOW</div><h2>Your workspace</h2></div><div id="health" class="status">Checking Ollama…</div></div>
+      <div class="run-card"><label for="workspacePath">Authorized folder path</label><div class="input-row"><input id="workspacePath" placeholder="/Users/you/Documents/demo-workspace"><button id="run" class="button primary">Run dry-run scan</button></div><small>Only this directory is read. No files are changed until you approve individual proposals.</small></div>
+      <div id="result" class="result empty"><div class="empty-icon">✦</div><h3>Nothing on the desk yet.</h3><p>Enter a local folder to inventory documents, detect duplicates, and build a safe review queue.</p></div>
+    </section>
+    <section class="feature-grid"><article><div class="card-number">A.</div><h3>Document desk</h3><p>Summaries, action items, decisions, and explicit deadlines with source references.</p></article><article><div class="card-number">B.</div><h3>Safe organizer</h3><p>Hash-based duplicate detection and reversible proposals, never silent moves.</p></article><article><div class="card-number">C.</div><h3>CSV lab</h3><p>Local profiling that still works when an optional prediction provider is unavailable.</p></article></section>
+  </main>
+  <footer><span>SlothDesk AI / 2026</span><span>Built for calm, inspectable automation.</span></footer>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    async function loadHealth() { const data = await fetch('/api/health').then(r => r.json()); $('health').textContent = data.model.message; }
+    function escapeHtml(value) { return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
+    $('run').onclick = async () => {
+      const workspace = $('workspacePath').value.trim(); if (!workspace) return;
+      $('run').disabled = true; $('run').textContent = 'Scanning…';
+      try {
+        const data = await fetch('/api/cleanup', { method: 'POST', headers: {'content-type':'application/json'}, body: JSON.stringify({workspace}) }).then(r => r.json());
+        if (data.error) throw new Error(data.error);
+        $('result').className = 'result';
+        $('result').innerHTML = `<div class="result-top"><div><div class="eyebrow">EXECUTION ${escapeHtml(data.id.slice(0,8))}</div><h3>${data.filesProcessed} files inventoried</h3></div><div class="saved">~${data.estimatedNetMinutesSaved.toFixed(1)} min saved <small>estimate</small></div></div><div class="metrics"><span><b>${data.tasksExtracted}</b> tasks</span><span><b>${data.duplicates}</b> duplicates</span><span><b>${data.proposals.length}</b> proposals</span><span><b>${data.errors.length}</b> errors</span></div><div class="reports">${data.reports.map(r => `<article><strong>${escapeHtml(r.source)}</strong><span>${escapeHtml(r.category)} · ${escapeHtml(r.provider)}</span><p>${escapeHtml(r.summary)}</p>${r.tasks.length ? `<b>Tasks</b><ul>${r.tasks.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ul>` : ''}</article>`).join('')}</div>${data.proposals.length ? `<h4>Review queue</h4><div class="proposals">${data.proposals.map(p => `<label><input type="checkbox" value="${p.id}" checked> <span>${escapeHtml(p.sourcePath.split('/').pop())} → ${escapeHtml(p.destinationPath.replace(data.workspace, ''))}<small>${escapeHtml(p.reason)}</small></span></label>`).join('')}</div><button id="approve" class="button primary">Approve selected moves</button>` : '<p class="notice">No file moves were proposed. Your workspace is unchanged.</p>'}`;
+        const approve = $('approve'); if (approve) approve.onclick = async () => { approve.disabled = true; approve.textContent = 'Applying…'; const approvedIds = [...document.querySelectorAll('.proposals input:checked')].map(x => x.value); const response = await fetch('/api/approve', {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({execution:data, approvedIds})}).then(r=>r.json()); approve.textContent = `${response.results.filter(r => r.status === 'completed').length} moves applied`; };
+      } catch (error) { $('result').innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`; } finally { $('run').disabled = false; $('run').textContent = 'Run dry-run scan'; }
+    };
+    loadHealth();
+  </script>
+</body>
+</html>

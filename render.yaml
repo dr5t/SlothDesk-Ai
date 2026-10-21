@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: slothdesk-ai
+    runtime: node
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: HOSTED_MODE
+        value: "true"
+      - key: OLLAMA_BASE_URL
+        value: "http://127.0.0.1:11434"
+      - key: OLLAMA_MODEL
+        value: "gemma3:4b"
