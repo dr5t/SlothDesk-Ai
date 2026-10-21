@@ -15,13 +15,19 @@
         <img src="/logo.svg" alt="SlothDesk AI Mascot" class="brand-logo" width="32" height="32">
         <span>SLOTHDESK <em>AI</em></span>
       </a>
-      <div class="mode">
-        <span class="mode-dot"></span>
-        <span>LOCAL-FIRST / GEMMA READY</span>
+      <div class="topbar-right">
+        <div class="mode">
+          <span class="mode-dot"></span>
+          <span>LOCAL-FIRST / GEMMA READY</span>
+        </div>
+        <button id="menuToggle" class="menu-toggle button" aria-expanded="false" aria-controls="tabsWrapper" aria-label="Toggle navigation menu">
+          <span class="menu-toggle-icon" aria-hidden="true">☰</span>
+          <span class="menu-toggle-label">MENU</span>
+        </button>
       </div>
     </header>
   </div>
-  <nav class="tabs-wrapper" aria-label="Main navigation">
+  <nav class="tabs-wrapper" id="tabsWrapper" aria-label="Main navigation">
     <div class="tabs">
       <button class="tab active" data-view="dashboard">Dashboard</button>
       <button class="tab" data-view="workspace">Workspace</button>
@@ -169,10 +175,29 @@
       if (!response.ok) throw new Error(data.error || 'Request failed');
       return data;
     };
+    const menuToggle = $('menuToggle');
+    const tabsWrapper = $('tabsWrapper');
+    function closeMenu() {
+      if (!menuToggle || !tabsWrapper) return;
+      menuToggle.setAttribute('aria-expanded', 'false');
+      tabsWrapper.classList.remove('open');
+      const icon = menuToggle.querySelector('.menu-toggle-icon');
+      if (icon) icon.textContent = '☰';
+    }
+    function toggleMenu() {
+      if (!menuToggle || !tabsWrapper) return;
+      const isOpen = tabsWrapper.classList.contains('open');
+      menuToggle.setAttribute('aria-expanded', String(!isOpen));
+      tabsWrapper.classList.toggle('open', !isOpen);
+      const icon = menuToggle.querySelector('.menu-toggle-icon');
+      if (icon) icon.textContent = !isOpen ? '✕' : '☰';
+    }
+    if (menuToggle) menuToggle.onclick = toggleMenu;
     function show(view) {
       document.querySelectorAll('.view').forEach(x => x.classList.toggle('active', x.id === view));
       document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.view === view));
       location.hash = view;
+      closeMenu();
       if (view === 'activity' || view === 'dashboard') loadHistory();
       if (view === 'review') renderReview();
     }
@@ -394,13 +419,22 @@
     };
     $('refreshHealth').onclick = () => health();
     document.addEventListener('keydown', (e) => {
-      if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('.button, .preset-chip')) {
+      if (e.key === 'Escape' && tabsWrapper && tabsWrapper.classList.contains('open')) {
+        closeMenu();
+        if (menuToggle) menuToggle.focus();
+      }
+      if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('.button, .preset-chip, .tab')) {
         e.target.classList.add('pressed');
       }
     });
     document.addEventListener('keyup', (e) => {
-      if (e.target && e.target.matches && e.target.matches('.button, .preset-chip')) {
+      if (e.target && e.target.matches && e.target.matches('.button, .preset-chip, .tab')) {
         e.target.classList.remove('pressed');
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (tabsWrapper && tabsWrapper.classList.contains('open') && !tabsWrapper.contains(e.target) && !menuToggle.contains(e.target)) {
+        closeMenu();
       }
     });
     health();
