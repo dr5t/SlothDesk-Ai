@@ -12,7 +12,7 @@
   --danger-light: #faecea;
   --success: #1b663e;
   --success-light: #eaf4ee;
-  --shadow-offset: 3px;
+  --shadow-offset: 4px;
 }
 
 * {
@@ -58,37 +58,42 @@ body::before {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   font-weight: 900;
   font-size: 16px;
   letter-spacing: 0.08em;
   color: var(--ink);
   text-decoration: none;
   user-select: none;
-  transition: transform 0.08s ease;
+  transform: translate(0, 0);
+  transition: transform 70ms ease-out;
 }
 
 .brand:hover {
-  transform: translate(-1px, -1px);
+  transform: translate(0, 0);
+}
+
+.brand:active {
+  transform: translate(2px, 2px);
 }
 
 .brand:focus-visible {
-  outline: 2px solid var(--orange);
+  outline: 3px solid var(--orange);
   outline-offset: 4px;
 }
 
-.brand-mark {
-  display: inline-grid;
-  place-items: center;
+.brand-logo {
   width: 32px;
   height: 32px;
-  background: var(--orange);
-  color: #fff;
-  border: 2px solid var(--line);
+  display: block;
+  border-radius: 5px;
   box-shadow: 2px 2px 0 var(--line);
-  font-weight: 900;
-  font-size: 16px;
-  line-height: 1;
+  transition: transform 70ms ease-out, box-shadow 70ms ease-out;
+}
+
+.brand:active .brand-logo {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 var(--line);
 }
 
 .brand em {
@@ -167,6 +172,10 @@ body::before {
 
 .tab:hover:not(.active) {
   background: #ede6da;
+}
+
+.tab:active {
+  background: #ded7ca;
 }
 
 .tab:focus-visible {
@@ -251,62 +260,80 @@ main {
   padding: 12px 20px;
   background: var(--surface-white);
   color: var(--ink);
-  box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--line);
-  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.12s ease;
+  box-shadow: 4px 4px 0 var(--line);
+  transform: translate(0, 0);
+  transition:
+    transform 70ms ease-out,
+    box-shadow 70ms ease-out,
+    background-color 120ms ease;
   user-select: none;
 }
 
 .button:hover:not(:disabled) {
-  transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0 var(--line);
+  transform: translate(0, 0);
+  background-color: #f7f3ec;
 }
 
-.button:active:not(:disabled) {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 var(--line);
+.button:active:not(:disabled),
+.button.pressed:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--line);
 }
 
 .button:focus-visible {
-  outline: 2px solid var(--orange);
-  outline-offset: 3px;
+  outline: 3px solid var(--orange);
+  outline-offset: 4px;
 }
 
-.button:disabled {
+.button:disabled,
+.button[disabled],
+.button.loading {
   opacity: 0.5;
   cursor: not-allowed;
-  box-shadow: 1px 1px 0 var(--line);
-  transform: none;
+  box-shadow: 2px 2px 0 var(--line);
+  transform: translate(0, 0);
+  pointer-events: none;
 }
 
 .button.primary {
   background: var(--orange);
   color: #ffffff;
+  border-color: var(--line);
+  box-shadow: 4px 4px 0 var(--line);
 }
 
 .button.primary:hover:not(:disabled) {
   background: var(--orange-hover);
+  transform: translate(0, 0);
+}
+
+.button.primary:active:not(:disabled),
+.button.primary.pressed:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--line);
 }
 
 .button.danger {
   background: #ffffff;
   color: var(--danger);
   border-color: var(--danger);
-  box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--danger);
+  box-shadow: 4px 4px 0 var(--danger);
 }
 
 .button.danger:hover:not(:disabled) {
   background: var(--danger-light);
-  box-shadow: 4px 4px 0 var(--danger);
+  transform: translate(0, 0);
 }
 
-.button.danger:active:not(:disabled) {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 var(--danger);
+.button.danger:active:not(:disabled),
+.button.danger.pressed:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--danger);
 }
 
 .button.danger:focus-visible {
-  outline: 2px solid var(--danger);
-  outline-offset: 3px;
+  outline: 3px solid var(--danger);
+  outline-offset: 4px;
 }
 
 .section-head {
@@ -466,17 +493,35 @@ main {
   display: inline-block;
   cursor: pointer;
   background: #ede6da;
-  border: 1px solid var(--line);
-  padding: 2px 6px;
+  border: 2px solid var(--line);
+  padding: 3px 8px;
   font-family: monospace;
   font-size: 11px;
+  font-weight: 700;
   margin-left: 4px;
-  transition: background 0.1s ease;
+  box-shadow: 2px 2px 0 var(--line);
+  transform: translate(0, 0);
+  transition:
+    transform 70ms ease-out,
+    box-shadow 70ms ease-out,
+    background-color 120ms ease;
+  user-select: none;
 }
 
 .preset-chip:hover {
   background: var(--orange-light);
-  border-color: var(--orange);
+  transform: translate(0, 0);
+}
+
+.preset-chip:active,
+.preset-chip.pressed {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 var(--line);
+}
+
+.preset-chip:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
 }
 
 .result {

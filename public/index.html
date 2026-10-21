@@ -4,13 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SlothDesk AI — calm automation</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="alternate icon" href="/favicon.svg">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="topbar-wrapper">
     <header class="topbar">
-      <a class="brand" href="#dashboard" id="brandLink">
-        <span class="brand-mark">S</span>
+      <a class="brand" href="#dashboard" id="brandLink" aria-label="SlothDesk AI Home">
+        <img src="/logo.svg" alt="SlothDesk AI Mascot" class="brand-logo" width="32" height="32">
         <span>SLOTHDESK <em>AI</em></span>
       </a>
       <div class="mode">
@@ -391,6 +393,16 @@
       }
     };
     $('refreshHealth').onclick = () => health();
+    document.addEventListener('keydown', (e) => {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('.button, .preset-chip')) {
+        e.target.classList.add('pressed');
+      }
+    });
+    document.addEventListener('keyup', (e) => {
+      if (e.target && e.target.matches && e.target.matches('.button, .preset-chip')) {
+        e.target.classList.remove('pressed');
+      }
+    });
     health();
     loadHistory();
     if (location.hash) show(location.hash.slice(1));
