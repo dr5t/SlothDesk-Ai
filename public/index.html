@@ -16,9 +16,9 @@
         <span>SLOTHDESK <em>AI</em></span>
       </a>
       <div class="topbar-right">
-        <div class="mode">
-          <span class="mode-dot"></span>
-          <span>LOCAL-FIRST / GEMMA READY</span>
+        <div class="mode" id="modeContainer">
+          <span class="mode-dot" id="modeDot"></span>
+          <span id="modeText">LOCAL-FIRST · CHECKING AI…</span>
         </div>
         <button id="menuToggle" class="menu-toggle button" aria-expanded="false" aria-controls="tabsWrapper" aria-label="Toggle navigation menu">
           <span class="menu-toggle-icon" aria-hidden="true">☰</span>
@@ -34,6 +34,7 @@
       <button class="tab" data-view="studio">Automation Studio</button>
       <button class="tab" data-view="review">Review Center</button>
       <button class="tab" data-view="csv">CSV Lab</button>
+      <button class="tab" data-view="ai">AI Control Center</button>
       <button class="tab" data-view="activity">Activity & Settings</button>
     </div>
   </nav>
@@ -46,6 +47,7 @@
         <div class="hero-actions">
           <button class="button primary" data-go="workspace">Open workspace ↘</button>
           <button class="button" data-go="studio">Explore studio</button>
+          <button class="button" data-go="ai">AI Control Center</button>
         </div>
       </div>
       <div class="section-head">
@@ -137,10 +139,86 @@
         <button class="button primary" data-go="workspace">Open workspace ↘</button>
       </div>
     </section>
+    <section id="ai" class="view">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">05 / LOCAL INFERENCE & RUNTIME CONTROL</div>
+          <h2>AI Control Center</h2>
+        </div>
+        <div class="header-actions">
+          <span id="aiHeaderBadge" class="status">Checking provider…</span>
+          <button id="recheckAiBtn" class="button">Check connection now ↻</button>
+        </div>
+      </div>
+      <p class="lede" style="font-size: 15px; margin-bottom: 24px;">Monitor Ollama daemon reachability, local model availability, verification proofs, and deterministic fallback status without cloud exposure.</p>
+
+      <div class="ai-grid">
+        <article class="panel ai-card">
+          <div class="eyebrow">OLLAMA DAEMON</div>
+          <h3 id="aiCardConnection">Checking…</h3>
+          <p id="aiCardConnectionDetail">Probing local Ollama service endpoint.</p>
+        </article>
+        <article class="panel ai-card">
+          <div class="eyebrow">CONFIGURED MODEL</div>
+          <h3 id="aiCardModel">gemma3:4b</h3>
+          <p id="aiCardModelDetail">Default open-weight local model.</p>
+        </article>
+        <article class="panel ai-card">
+          <div class="eyebrow">RUNTIME AVAILABILITY</div>
+          <h3 id="aiCardAvailable">Checking…</h3>
+          <p id="aiCardAvailableDetail">Verifying model weights on host.</p>
+        </article>
+        <article class="panel ai-card">
+          <div class="eyebrow">INFERENCE PROOF</div>
+          <h3 id="aiCardVerification">Checking…</h3>
+          <p id="aiCardVerificationDetail">Evaluating session execution evidence.</p>
+        </article>
+      </div>
+
+      <div class="ai-meta-grid">
+        <article class="panel">
+          <div class="eyebrow">LATEST WORKFLOW ENGINE</div>
+          <h3 id="aiLatestEngine" style="font-size: 20px; margin-bottom: 8px;">No analysis executed yet</h3>
+          <p id="aiLatestEngineDesc" style="margin-bottom: 8px;">Run a workspace scan to see whether tasks are extracted with Gemma 3 or the TypeScript fallback engine.</p>
+          <small id="aiLatestTimestamp" style="color: var(--ink-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;"></small>
+        </article>
+        <article class="panel">
+          <div class="eyebrow">PROVIDER DIAGNOSTICS & ERRORS</div>
+          <div id="aiDiagnosticsBox" class="ai-diag-content">
+            <p style="margin: 0; color: var(--ink-muted);">Probing diagnostics…</p>
+          </div>
+        </article>
+      </div>
+
+      <article class="panel ai-setup-panel" id="aiSetupPanel">
+        <div class="eyebrow">SETUP GUIDANCE · LOCAL OPEN-WEIGHT AI</div>
+        <h3 style="font-size: 22px; margin: 0 0 10px;">Enabling Gemma 3 with Ollama</h3>
+        <p style="margin-bottom: 18px;">SlothDesk AI is strictly local-first and never sends document contents or extracted tasks to external cloud APIs. When Ollama is offline or uninstalled, deterministic local heuristics execute automatically.</p>
+        <div class="terminal-box">
+          <div class="terminal-head">
+            <span>TERMINAL COMMANDS</span>
+            <span class="terminal-badge">LOCAL HOST</span>
+          </div>
+          <div class="terminal-line">
+            <span class="prompt">$</span>
+            <code>ollama serve</code>
+            <small>Start the local Ollama background server</small>
+          </div>
+          <div class="terminal-line">
+            <span class="prompt">$</span>
+            <code>ollama pull gemma3:4b</code>
+            <small>Download and register the Gemma 3 4B parameter open-weight model</small>
+          </div>
+        </div>
+        <div class="ai-notice-box">
+          <strong>✦ Resilient Fallback:</strong> If Ollama is offline, unreachable, or missing the configured model, SlothDesk AI continues running seamlessly using deterministic TypeScript parsing and regex extraction.
+        </div>
+      </article>
+    </section>
     <section id="activity" class="view">
       <div class="section-head">
         <div>
-          <div class="eyebrow">05 / EVIDENCE + CONTROL</div>
+          <div class="eyebrow">06 / EVIDENCE + CONTROL</div>
           <h2>Activity & Settings</h2>
         </div>
       </div>
@@ -149,7 +227,10 @@
           <div class="eyebrow">RUNTIME ENVIRONMENT</div>
           <h3>Model Connection</h3>
           <p id="settingsHealth">Checking Ollama…</p>
-          <button id="refreshHealth" class="button">Refresh connection</button>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="refreshHealth" class="button">Refresh connection</button>
+            <button class="button primary" data-go="ai">Open AI Control Center ↘</button>
+          </div>
         </article>
         <article class="panel">
           <div class="eyebrow">SAFETY POLICY</div>
@@ -198,6 +279,7 @@
       document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.view === view));
       location.hash = view;
       closeMenu();
+      if (view === 'ai') loadAiStatus();
       if (view === 'activity' || view === 'dashboard') loadHistory();
       if (view === 'review') renderReview();
     }
@@ -208,17 +290,173 @@
     function metric(label, value) {
       return `<div class="metric-item"><b>${value}</b><span>${label}</span></div>`;
     }
-    async function health() {
+    async function loadAiStatus(forcePost = false) {
+      const badge = $('aiHeaderBadge');
+      const btn = $('recheckAiBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Checking…';
+      }
+      if (badge) badge.textContent = 'Checking provider…';
+
       try {
-        const data = await api('/api/health');
-        const text = `${data.model.available ? 'READY' : 'FALLBACK'} · ${data.model.message}`;
-        $('modelBadge').textContent = text;
-        $('settingsHealth').textContent = text;
+        const data = forcePost
+          ? await api('/api/health', { method: 'POST' })
+          : await api('/api/health');
+        const m = data.model;
+
+        const dot = $('modeDot');
+        const modeText = $('modeText');
+        if (dot && modeText) {
+          dot.className = 'mode-dot';
+          if (m.inferenceVerified) {
+            dot.classList.add('verified');
+            modeText.textContent = `LOCAL-FIRST · ${m.model} VERIFIED`;
+          } else if (m.available) {
+            dot.classList.add('standby');
+            modeText.textContent = 'LOCAL-FIRST · MODEL DETECTED (STANDBY)';
+          } else {
+            dot.classList.add('fallback');
+            modeText.textContent = 'LOCAL-FIRST · DETERMINISTIC FALLBACK';
+          }
+        }
+
+        const modelBadge = $('modelBadge');
+        if (modelBadge) {
+          if (m.inferenceVerified) {
+            modelBadge.textContent = `VERIFIED · ${m.model}`;
+          } else if (m.available) {
+            modelBadge.textContent = `STANDBY · ${m.model} detected (unverified)`;
+          } else {
+            modelBadge.textContent = 'FALLBACK · Deterministic local analysis';
+          }
+        }
+
+        const settingsHealth = $('settingsHealth');
+        if (settingsHealth) {
+          settingsHealth.textContent = m.inferenceVerified
+            ? `Verified: ${m.model} is active and verified by live inference.`
+            : (m.available ? `Standby: ${m.model} is installed in Ollama (unverified).` : m.message);
+        }
+
+        if (badge) {
+          if (m.inferenceVerified) {
+            badge.textContent = `VERIFIED · ${m.model}`;
+          } else if (m.available) {
+            badge.textContent = `STANDBY · ${m.model} DETECTED`;
+          } else {
+            badge.textContent = 'FALLBACK · DETERMINISTIC ACTIVE';
+          }
+        }
+
+        const cardModel = $('aiCardModel');
+        if (cardModel) cardModel.textContent = m.model || 'gemma3:4b';
+        const cardModelDetail = $('aiCardModelDetail');
+        if (cardModelDetail) {
+          cardModelDetail.textContent = m.installed
+            ? 'Configured model weights detected on host.'
+            : 'Configured model is not installed in Ollama.';
+        }
+
+        const cardConn = $('aiCardConnection');
+        const cardConnDetail = $('aiCardConnectionDetail');
+        if (cardConn && cardConnDetail) {
+          if (m.connected) {
+            cardConn.innerHTML = '<span style="color: var(--success);">CONNECTED</span>';
+            cardConnDetail.textContent = 'Ollama service is reachable on local host.';
+          } else {
+            cardConn.innerHTML = '<span style="color: var(--danger);">DISCONNECTED</span>';
+            cardConnDetail.textContent = 'Local Ollama service could not be reached.';
+          }
+        }
+
+        const cardAvail = $('aiCardAvailable');
+        const cardAvailDetail = $('aiCardAvailableDetail');
+        if (cardAvail && cardAvailDetail) {
+          if (m.available) {
+            cardAvail.innerHTML = '<span style="color: var(--success);">AVAILABLE</span>';
+            cardAvailDetail.textContent = 'Daemon is online and model weights are ready.';
+          } else {
+            cardAvail.innerHTML = '<span style="color: var(--danger);">UNAVAILABLE</span>';
+            cardAvailDetail.textContent = m.connected
+              ? `Model "${m.model}" needs to be pulled.`
+              : 'Ollama service is offline or unreachable.';
+          }
+        }
+
+        const cardVerif = $('aiCardVerification');
+        const cardVerifDetail = $('aiCardVerificationDetail');
+        if (cardVerif && cardVerifDetail) {
+          if (m.inferenceVerified) {
+            cardVerif.innerHTML = '<span style="color: var(--success);">VERIFIED</span>';
+            cardVerifDetail.textContent = 'Live inference succeeded with open-weight model.';
+          } else if (m.available) {
+            cardVerif.innerHTML = '<span style="color: var(--orange);">STANDBY</span>';
+            cardVerifDetail.textContent = 'Model detected, but no live inference verified yet.';
+          } else {
+            cardVerif.innerHTML = '<span style="color: var(--ink-muted);">FALLBACK</span>';
+            cardVerifDetail.textContent = 'Inference unavailable. Deterministic fallback active.';
+          }
+        }
+
+        const latestEngine = $('aiLatestEngine');
+        const latestEngineDesc = $('aiLatestEngineDesc');
+        if (latestEngine && latestEngineDesc) {
+          if (m.lastUsedProvider === 'ollama') {
+            latestEngine.textContent = `Open-Weight Local Model (${m.model})`;
+            latestEngineDesc.textContent = 'Latest document analysis was processed locally by Ollama using Gemma 3.';
+          } else if (m.lastUsedProvider === 'deterministic') {
+            latestEngine.textContent = 'Deterministic Heuristic Engine';
+            latestEngineDesc.textContent = 'Latest analysis used TypeScript deterministic extraction (rules & regex).';
+          } else {
+            latestEngine.textContent = 'No analysis executed yet';
+            latestEngineDesc.textContent = 'Run a workspace scan to execute your first document analysis.';
+          }
+        }
+
+        const latestTs = $('aiLatestTimestamp');
+        if (latestTs) {
+          latestTs.textContent = m.lastInferenceAt
+            ? `LAST ANALYSIS: ${new Date(m.lastInferenceAt).toLocaleString()}`
+            : '';
+        }
+
+        const diagBox = $('aiDiagnosticsBox');
+        if (diagBox) {
+          if (m.lastError) {
+            diagBox.innerHTML = `<div class="notice error" style="margin: 0;"><strong>Latest Provider Error:</strong> ${esc(m.lastError)}</div>`;
+          } else {
+            diagBox.innerHTML = '<div class="notice success" style="margin: 0;">No provider or inference errors reported. Local runtime operating normally.</div>';
+          }
+        }
       } catch (err) {
-        $('modelBadge').textContent = 'OFFLINE · Server unreachable';
-        $('settingsHealth').textContent = 'Server unreachable';
+        if (badge) badge.textContent = 'ERROR · UNABLE TO PROBE';
+        const cardConn = $('aiCardConnection');
+        const cardConnDetail = $('aiCardConnectionDetail');
+        if (cardConn) cardConn.innerHTML = '<span style="color: var(--danger);">ERROR</span>';
+        if (cardConnDetail) cardConnDetail.textContent = esc(err.message);
+        const diagBox = $('aiDiagnosticsBox');
+        if (diagBox) {
+          diagBox.innerHTML = `<div class="notice error" style="margin: 0;"><strong>Communication Error:</strong> ${esc(err.message)}</div>`;
+        }
+        const dot = $('modeDot');
+        const modeText = $('modeText');
+        if (dot && modeText) {
+          dot.className = 'mode-dot fallback';
+          modeText.textContent = 'LOCAL-FIRST · SERVER OFFLINE';
+        }
+        const modelBadge = $('modelBadge');
+        if (modelBadge) modelBadge.textContent = 'OFFLINE · Server unreachable';
+        const settingsHealth = $('settingsHealth');
+        if (settingsHealth) settingsHealth.textContent = 'Server unreachable';
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Check connection now ↻';
+        }
       }
     }
+    const health = () => loadAiStatus();
     async function loadHistory() {
       try {
         const data = await api('/api/executions');
@@ -410,6 +648,7 @@
           `;
         }
         loadHistory();
+        loadAiStatus();
       } catch (err) {
         $('scanResult').innerHTML = `<div class="notice error">${esc(err.message)}</div>`;
       } finally {
@@ -417,7 +656,9 @@
         $('run').textContent = 'Run dry-run scan';
       }
     };
-    $('refreshHealth').onclick = () => health();
+    $('refreshHealth').onclick = () => loadAiStatus(true);
+    const recheckBtn = $('recheckAiBtn');
+    if (recheckBtn) recheckBtn.onclick = () => loadAiStatus(true);
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && tabsWrapper && tabsWrapper.classList.contains('open')) {
         closeMenu();

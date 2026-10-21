@@ -1,7 +1,7 @@
 import { createServer, Server } from "node:http";
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
-import { OllamaProvider } from "../provider.js";
+import { OllamaProvider, sanitizeProviderError } from "../provider.js";
 
 function createMockOllama(handler: (req: any, res: any) => void): Promise<{ server: Server; url: string }> {
   return new Promise((resolve) => {
@@ -105,4 +105,100 @@ test("provider: analyze falls back to deterministic extraction if model response
   } finally {
     server.close();
   }
+});
+
+test("provider: health returns connected=true but available=false when configured model is not installed", async () => {
+  const { server, url } = await createMockOllama((req, res) => {
+    if (req.url === "/api/tags") {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ models: [{ name: "llama3:8b" }] }));
+      return;
+    }
+    res.writeHead(404);
+    res.end();
+  });
+
+  try {
+    const provider = new OllamaProvider(url, "gemma3:4b");
+    const health = await provider.health();
+    assert.equal(health.connected, true);
+    assert.equal(health.installed, false);
+    assert.equal(health.available, false);
+    assert.equal(health.inferenceVerified, false);
+    assert.match(health.message, /not installed/i);
+  } finally {
+    server.close();
+  }
+});
+
+test("provider: inferenceVerified is false on standby and becomes true after successful analysis", async () => {
+  const mockReport = {
+    summary: "Sprint plan",
+    facts: ["Fact 1"],
+    tasks: ["Task 1"],
+    decisions: ["Decision 1"],
+    deadlines: ["Deadline 1"],
+    category: "Actionable",
+    suggestedName: "plan.md"
+  };
+
+  const { server, url } = await createMockOllama((req, res) => {
+    if (req.url === "/api/tags") {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ models: [{ name: "gemma3:4b" }] }));
+      return;
+    }
+    if (req.url === "/api/generate" && req.method === "POST") {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ response: JSON.stringify(mockReport) }));
+      return;
+    }
+    res.writeHead(404);
+    res.end();
+  });
+
+  try {
+    const provider = new OllamaProvider(url, "gemma3:4b");
+    const initialHealth = await provider.health();
+    assert.equal(initialHealth.available, true);
+    assert.equal(initialHealth.inferenceVerified, false);
+
+    const report = await provider.analyze("file.md", "content");
+    assert.equal(report.provider, "ollama");
+
+    const postHealth = await provider.health();
+    assert.equal(postHealth.inferenceVerified, true);
+    assert.equal(postHealth.lastUsedProvider, "ollama");
+    assert.ok(postHealth.lastInferenceAt);
+  } finally {
+    server.close();
+  }
+});
+
+test("provider: unavailable daemon records sanitized error and uses deterministic fallback", async () => {
+  const provider = new OllamaProvider("http://127.0.0.1:9998", "gemma3:4b");
+  const report = await provider.analyze("doc.txt", "TODO: urgent item\nDeadline: tomorrow");
+  assert.equal(report.provider, "deterministic");
+  const health = await provider.health();
+  assert.equal(health.available, false);
+  assert.equal(health.connected, false);
+  assert.equal(health.inferenceVerified, false);
+  assert.equal(health.lastUsedProvider, "deterministic");
+  assert.ok(health.lastError);
+  assert.equal(health.lastError.includes("/Users/"), false);
+  assert.equal(health.lastError.includes("\n"), false);
+});
+
+test("provider: sanitizeProviderError redacts local paths and secrets without stack traces", () => {
+  const dirty = "Error: open /Users/shauryatiwari/secret/db.sqlite failed\n    at Object.open (node:fs:123)\n    at init (server.js:45)";
+  const clean = sanitizeProviderError(dirty);
+  assert.equal(clean.includes("/Users/"), false);
+  assert.equal(clean.includes("\n"), false);
+  assert.equal(clean.includes("at Object.open"), false);
+  assert.match(clean, /\[path\]/);
+
+  const secretError = "Error: connection failed with token=secret12345&key=mykey";
+  const cleanSecret = sanitizeProviderError(secretError);
+  assert.equal(cleanSecret.includes("secret12345"), false);
+  assert.equal(cleanSecret.includes("mykey"), false);
 });

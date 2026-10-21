@@ -1,5 +1,17 @@
 export type SupportedFileType = "text" | "markdown" | "csv" | "json" | "unsupported";
 
+export interface ProviderHealth {
+  available: boolean;
+  model: string;
+  message: string;
+  connected: boolean;
+  installed: boolean;
+  inferenceVerified: boolean;
+  lastUsedProvider?: "ollama" | "deterministic";
+  lastInferenceAt?: string;
+  lastError?: string;
+}
+
 export interface FileRecord {
   path: string;
   relativePath: string;

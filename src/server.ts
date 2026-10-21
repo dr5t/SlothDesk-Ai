@@ -3,7 +3,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { approveOperations, rollbackExecution, runCleanup } from "./workflow.js";
 import { getExecution, listExecutions } from "./store.js";
-import { OllamaProvider } from "./provider.js";
+import { defaultProvider } from "./provider.js";
 
 const port = Number(process.env.PORT ?? 3147);
 const publicDir = path.resolve("public");
@@ -17,8 +17,19 @@ export const server = createServer(async (request: IncomingMessage, response: Se
   try {
     const url = new URL(request.url ?? "/", `http://${request.headers.host ?? "localhost"}`);
 
-    if (request.method === "GET" && url.pathname === "/api/health") {
-      return json(response, 200, { ok: true, model: await new OllamaProvider().health() });
+    if ((request.method === "GET" || request.method === "POST") && (url.pathname === "/api/health" || url.pathname === "/api/provider")) {
+      const health = await defaultProvider.health();
+      if (!health.lastUsedProvider) {
+        const executions = await listExecutions();
+        const latest = executions[0];
+        if (latest && latest.reports && latest.reports.length > 0) {
+          const hasOllama = latest.reports.some((r) => r.provider === "ollama");
+          health.lastUsedProvider = hasOllama ? "ollama" : "deterministic";
+          if (hasOllama) health.inferenceVerified = true;
+          health.lastInferenceAt = latest.endedAt;
+        }
+      }
+      return json(response, 200, { ok: true, model: health });
     }
 
     if (request.method === "GET" && url.pathname === "/api/executions") {

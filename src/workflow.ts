@@ -1,7 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { csvProfile, hashFile, safeWorkspacePath, scanWorkspace } from "./core.js";
-import { OllamaProvider } from "./provider.js";
+import { defaultProvider, type ModelProvider } from "./provider.js";
 import { appendJournal, getExecution, listJournal, saveExecution, updateJournal } from "./store.js";
 import type { Execution, OperationJournalEntry, Proposal } from "./types.js";
 
@@ -18,11 +18,10 @@ async function pathExists(filePath: string): Promise<boolean> {
   }
 }
 
-export async function runCleanup(workspace: string): Promise<Execution> {
+export async function runCleanup(workspace: string, provider: ModelProvider = defaultProvider): Promise<Execution> {
   const started = Date.now();
   const maxBytes = Number(process.env.MAX_FILE_BYTES) || 1_048_576;
   const records = await scanWorkspace(workspace, maxBytes);
-  const provider = new OllamaProvider();
   const reports = [];
   const proposals: Proposal[] = [];
   const errors: string[] = [];

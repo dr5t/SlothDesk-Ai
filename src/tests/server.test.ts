@@ -116,3 +116,31 @@ test("server: static file serving and path traversal protection", async () => {
   const missingRes = await fetch(`${baseUrl}/missing-file.xyz`);
   assert.equal(missingRes.status, 404);
 });
+
+test("server: POST /api/health and GET /api/provider return provider status with model details", async () => {
+  const postRes = await fetch(`${baseUrl}/api/health`, { method: "POST" });
+  assert.equal(postRes.status, 200);
+  const postData = (await postRes.json()) as any;
+  assert.equal(postData.ok, true);
+  assert.ok(postData.model);
+  assert.equal(typeof postData.model.connected, "boolean");
+  assert.equal(typeof postData.model.installed, "boolean");
+  assert.equal(typeof postData.model.inferenceVerified, "boolean");
+
+  const getProvRes = await fetch(`${baseUrl}/api/provider`);
+  assert.equal(getProvRes.status, 200);
+  const provData = (await getProvRes.json()) as any;
+  assert.equal(provData.ok, true);
+  assert.equal(provData.model.model, "gemma3:4b");
+});
+
+test("server: provider status does not leak stack traces or internal paths", async () => {
+  const res = await fetch(`${baseUrl}/api/health`);
+  assert.equal(res.status, 200);
+  const data = (await res.json()) as any;
+  if (data.model.lastError) {
+    assert.equal(data.model.lastError.includes("/Users/"), false);
+    assert.equal(data.model.lastError.includes("\n"), false);
+    assert.equal(data.model.lastError.includes("node:"), false);
+  }
+});
