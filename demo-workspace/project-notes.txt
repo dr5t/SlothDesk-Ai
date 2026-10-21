@@ -1,0 +1,2 @@
+Task: Review the onboarding copy.
+Decision: Use a smaller demo workspace for the recording.

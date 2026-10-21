@@ -19,7 +19,11 @@ Environment variables are documented in [.env.example](./.env.example). The defa
 
 The server reads only the explicitly entered workspace. It validates all derived paths against that workspace, hashes files with SHA-256 for duplicate detection, skips oversized files, never deletes files, and never overwrites an existing destination. The workflow stores an execution journal under `.data/`. Treat document text as untrusted data: it cannot grant the model or application additional permissions.
 
-The current prototype supports TXT, Markdown, CSV, and JSON. PDF extraction, durable rollback, authentication, hosted uploads, TabPFN, Sentry, and Render deployment configuration remain intentionally unimplemented until their runtime and security contracts are tested.
+The current prototype supports TXT, Markdown, CSV, and JSON. Approved moves are recorded in `.data/operations.json` and can be rolled back when the original path is still free. PDF extraction, authentication, hosted uploads, TabPFN, and Sentry remain intentionally unimplemented until their runtime and security contracts are tested.
+
+### TabPFN decision
+
+Prior Labs' current documentation describes TabPFN-3.5 classification and regression, with forecasting and anomaly-detection capabilities documented separately. It supports Python 3.10+, can use raw pandas data, and recommends a GPU for practical local performance; first use downloads a checkpoint. The repository is TypeScript-only and the available environment has no verified Python/TabPFN runtime, checkpoint, or evaluation dataset, so SlothDesk reports CSV profiles but does not pretend to produce predictions. Any future adapter must isolate the Python service, compare against a baseline, disclose the checkpoint download, and review the upstream Apache-2.0 license and any model-specific terms. References: [Prior Labs documentation](https://docs.priorlabs.ai/overview.md) and [TabPFN repository](https://github.com/PriorLabs/TabPFN).
 
 ## Architecture
 
@@ -31,8 +35,12 @@ The current prototype supports TXT, Markdown, CSV, and JSON. PDF extraction, dur
 
 ## Limitations and roadmap
 
-This is a functional foundation for the five-minute demo, not a hosted multi-user product. It intentionally does not expose arbitrary local filesystem access from a public deployment. Next steps are authenticated hosted uploads, SQLite persistence, richer rollback journaling, PDF extraction, cancellation, request rate limiting, and an independently tested optional TabPFN adapter. Predictions are never fabricated when TabPFN is unavailable.
+This is a functional local demo, not a hosted multi-user product. Render is configured in [render.yaml](./render.yaml) with `HOSTED_MODE=true`; that mode rejects local workspace paths because a public server must not expose its own filesystem. Render's ephemeral filesystem also means `.data/` is not durable without a persistent disk or database. Next steps are authenticated hosted uploads, SQLite persistence, PDF extraction, cancellation, request rate limiting, and an independently tested optional TabPFN adapter. Predictions are never fabricated when TabPFN is unavailable.
 
 ## License
 
-No license has been selected yet. Add one after the project owner confirms the intended permissions and contribution policy.
+MIT; see [LICENSE](./LICENSE).
+
+## Deployment
+
+See [deployment guide](./docs/DEPLOYMENT.md) for Render configuration and the local-versus-hosted boundary. The deployment has not been executed or assigned a public URL in this repository.

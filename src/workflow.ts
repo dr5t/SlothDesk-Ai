@@ -61,9 +61,12 @@ export async function approveOperations(execution: Execution, approvedIds: strin
       const workspace = stored.workspace;
       const source = safeWorkspacePath(workspace, path.relative(workspace, item.sourcePath));
       const destination = safeWorkspacePath(workspace, path.relative(workspace, item.destinationPath));
+      const realWorkspace = await fs.realpath(workspace);
       const sourceRealPath = await fs.realpath(source);
-      if (sourceRealPath !== source && !sourceRealPath.startsWith(`${workspace}${path.sep}`)) throw new Error("Source symlink escapes workspace.");
+      if (!sourceRealPath.startsWith(`${realWorkspace}${path.sep}`)) throw new Error("Source symlink escapes workspace.");
       await fs.mkdir(path.dirname(destination), { recursive: true });
+      const destinationParent = await fs.realpath(path.dirname(destination));
+      if (!destinationParent.startsWith(`${realWorkspace}${path.sep}`) && destinationParent !== realWorkspace) throw new Error("Destination path escapes workspace.");
       await fs.access(destination).then(() => { throw new Error("Destination already exists."); }).catch((error: unknown) => {
         if (error instanceof Error && error.message === "Destination already exists.") throw error;
       });

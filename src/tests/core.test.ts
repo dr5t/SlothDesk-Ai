@@ -1,4 +1,4 @@
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { strict as assert } from "node:assert";
@@ -20,9 +20,12 @@ test("scans files and detects cryptographic duplicates", async () => {
   const workspace = await mkdtemp(path.join(tmpdir(), "slothdesk-"));
   await writeFile(path.join(workspace, "a.txt"), "same");
   await writeFile(path.join(workspace, "b.txt"), "same");
+  await mkdir(path.join(workspace, "nested"));
+  await writeFile(path.join(workspace, "nested", "c.txt"), "nested");
   const records = await scanWorkspace(workspace);
-  assert.equal(records.length, 2);
+  assert.equal(records.length, 3);
   assert.equal(records.filter((record) => record.duplicateOf).length, 1);
+  assert.equal(records.some((record) => record.relativePath === path.join("nested", "c.txt")), true);
 });
 
 test("profiles CSV data without a model", () => {
@@ -41,9 +44,9 @@ test("approved moves are journaled and can be rolled back", async () => {
   assert.ok(move);
   const result = await approveOperations(execution, [move.id]);
   assert.equal(result[0].status, "completed");
-  assert.equal(await scanWorkspace(workspace).then((items) => items.some((item) => item.name === "notes.txt")), false);
+  assert.equal(await scanWorkspace(workspace).then((items) => items.some((item) => item.path === path.join(workspace, "notes.txt"))), false);
   const rollback = await rollbackExecution(execution.id);
   assert.equal(rollback[0].status, "rolled_back");
-  assert.equal(await scanWorkspace(workspace).then((items) => items.some((item) => item.name === "notes.txt")), true);
+  assert.equal(await scanWorkspace(workspace).then((items) => items.some((item) => item.path === path.join(workspace, "notes.txt"))), true);
   await rm(workspace, { recursive: true, force: true });
 });

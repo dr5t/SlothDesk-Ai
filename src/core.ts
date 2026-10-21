@@ -31,27 +31,36 @@ export async function hashFile(filePath: string): Promise<string> {
 
 export async function scanWorkspace(workspace: string, maxBytes = 1_048_576): Promise<FileRecord[]> {
   const root = path.resolve(workspace);
-  const entries = await fs.readdir(root, { withFileTypes: true });
   const records: FileRecord[] = [];
   const hashes = new Map<string, string>();
-  for (const entry of entries) {
+  const pending = [root];
+  while (pending.length) {
+    const current = pending.pop() as string;
+    const entries = await fs.readdir(current, { withFileTypes: true });
+    for (const entry of entries) {
+    const filePath = safeWorkspacePath(root, path.relative(root, path.join(current, entry.name)));
+    if (entry.isDirectory()) {
+      pending.push(filePath);
+      continue;
+    }
     if (!entry.isFile()) continue;
-    const filePath = safeWorkspacePath(root, entry.name);
     const stat = await fs.stat(filePath);
     const type = classifyFile(entry.name);
     if (stat.size > maxBytes) continue;
     const hash = await hashFile(filePath);
     const duplicateOf = hashes.get(hash);
-    hashes.set(hash, entry.name);
+    const relativePath = path.relative(root, filePath);
+    hashes.set(hash, relativePath);
     records.push({
       path: filePath,
-      relativePath: entry.name,
+      relativePath,
       name: entry.name,
       type,
       size: stat.size,
       hash,
       ...(duplicateOf ? { duplicateOf } : {})
     });
+    }
   }
   return records;
 }
