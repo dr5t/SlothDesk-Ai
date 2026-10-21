@@ -1,4 +1,4 @@
-import { createServer } from "node:http";
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { approveOperations, rollbackExecution, runCleanup } from "./workflow.js";
@@ -8,12 +8,12 @@ import { OllamaProvider } from "./provider.js";
 const port = Number(process.env.PORT ?? 3147);
 const publicDir = path.resolve("public");
 
-export const json = (response: import("node:http").ServerResponse, status: number, value: unknown) => {
+export const json = (response: ServerResponse, status: number, value: unknown) => {
   response.writeHead(status, { "content-type": "application/json; charset=utf-8" });
   response.end(JSON.stringify(value));
 };
 
-export const server = createServer(async (request, response) => {
+export const server = createServer(async (request: IncomingMessage, response: ServerResponse) => {
   try {
     const url = new URL(request.url ?? "/", `http://${request.headers.host ?? "localhost"}`);
 
@@ -112,7 +112,7 @@ export const server = createServer(async (request, response) => {
   }
 });
 
-async function readBody(request: import("node:http").IncomingMessage): Promise<Record<string, any>> {
+async function readBody(request: IncomingMessage): Promise<Record<string, any>> {
   let raw = "";
   for await (const chunk of request) raw += chunk;
   if (raw.length > 100_000) throw new Error("Request too large.");

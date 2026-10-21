@@ -7,68 +7,393 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <header class="topbar"><a class="brand" href="#dashboard"><span class="brand-mark">S</span> SLOTHDESK <em>AI</em></a><span class="mode">LOCAL-FIRST / GEMMA READY</span></header>
-  <nav class="tabs" aria-label="Main navigation">
-    <button class="tab active" data-view="dashboard">Dashboard</button><button class="tab" data-view="workspace">Workspace</button><button class="tab" data-view="studio">Automation Studio</button><button class="tab" data-view="review">Review Center</button><button class="tab" data-view="csv">CSV Lab</button><button class="tab" data-view="activity">Activity & Settings</button>
+  <div class="topbar-wrapper">
+    <header class="topbar">
+      <a class="brand" href="#dashboard" id="brandLink">
+        <span class="brand-mark">S</span>
+        <span>SLOTHDESK <em>AI</em></span>
+      </a>
+      <div class="mode">
+        <span class="mode-dot"></span>
+        <span>LOCAL-FIRST / GEMMA READY</span>
+      </div>
+    </header>
+  </div>
+  <nav class="tabs-wrapper" aria-label="Main navigation">
+    <div class="tabs">
+      <button class="tab active" data-view="dashboard">Dashboard</button>
+      <button class="tab" data-view="workspace">Workspace</button>
+      <button class="tab" data-view="studio">Automation Studio</button>
+      <button class="tab" data-view="review">Review Center</button>
+      <button class="tab" data-view="csv">CSV Lab</button>
+      <button class="tab" data-view="activity">Activity & Settings</button>
+    </div>
   </nav>
   <main>
     <section id="dashboard" class="view active">
-      <div class="hero"><div class="eyebrow">PRODUCTIVITY AUTOMATION WORKBENCH</div><h1>Let the busywork<br><span>move slower.</span></h1><p class="lede">Turn scattered notes and datasets into a reviewable action plan, with local open-weight AI when Ollama is available.</p><button class="button primary" data-go="workspace">Open workspace ↘</button></div>
-      <div class="section-head"><div><div class="eyebrow">LIVE, NOT DECORATIVE</div><h2>Your desk today</h2></div><span id="dashboardStatus" class="status">Loading history…</span></div>
-      <div id="dashboardMetrics" class="metrics large"></div><div id="recent" class="cards"></div>
+      <div class="hero">
+        <div class="eyebrow">00 / PRODUCTIVITY AUTOMATION WORKBENCH</div>
+        <h1>Let the busywork<br><span>move slower.</span></h1>
+        <p class="lede">Turn scattered notes and datasets into a reviewable action plan, with local open-weight AI when Ollama is available.</p>
+        <div class="hero-actions">
+          <button class="button primary" data-go="workspace">Open workspace ↘</button>
+          <button class="button" data-go="studio">Explore studio</button>
+        </div>
+      </div>
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">LIVE, NOT DECORATIVE</div>
+          <h2>Your desk today</h2>
+        </div>
+        <span id="dashboardStatus" class="status">Loading history…</span>
+      </div>
+      <div id="dashboardMetrics" class="metrics"></div>
+      <div id="recent" class="cards"></div>
     </section>
     <section id="workspace" class="view">
-      <div class="section-head"><div><div class="eyebrow">01 / DISCOVER + ANALYZE</div><h2>Workspace</h2></div><span id="modelBadge" class="status">Checking model…</span></div>
-      <div class="run-card"><label for="workspacePath">Authorized folder path</label><div class="input-row"><input id="workspacePath" placeholder="/Users/you/Documents/demo-workspace"><button id="run" class="button primary">Run dry-run scan</button></div><small>Only this directory is read. Nothing moves until you approve individual proposals.</small></div>
-      <div id="scanResult" class="result empty"><div class="empty-icon">✦</div><h3>Nothing on the desk yet.</h3><p>Enter a synthetic demo folder or a workspace you explicitly authorize.</p></div>
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">01 / DISCOVER + ANALYZE</div>
+          <h2>Workspace</h2>
+        </div>
+        <span id="modelBadge" class="status">Checking model…</span>
+      </div>
+      <div class="run-card">
+        <label for="workspacePath">Authorized folder path</label>
+        <div class="input-row">
+          <input id="workspacePath" placeholder="/tmp/slothdesk-demo">
+          <button id="run" class="button primary">Run dry-run scan</button>
+        </div>
+        <small>Only this directory is read. Sample preset: <span class="preset-chip" id="presetDemo">demo-workspace</span></small>
+      </div>
+      <div id="scanResult" class="result empty">
+        <div class="empty-icon">✦</div>
+        <h3>Nothing on the desk yet.</h3>
+        <p>Enter a synthetic demo folder or an authorized workspace to inspect files, detect duplicates, and extract tasks.</p>
+      </div>
     </section>
     <section id="studio" class="view">
-      <div class="eyebrow">02 / COMPOSE + EXECUTE</div><h2>Automation Studio</h2>
-      <div class="studio-grid"><article class="panel"><span class="card-number">01</span><h3>Lazy Cleanup</h3><p>Discover files, extract signals, propose categories, and pause for approval.</p><button class="button" data-go="workspace">Configure workflow</button></article><article class="panel"><span class="card-number">02</span><h3>Workflow stages</h3><ol><li>Discover files</li><li>Extract and profile</li><li>Generate proposals</li><li>Request approval</li><li>Execute and verify</li></ol></article></div>
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">02 / COMPOSE + EXECUTE</div>
+          <h2>Automation Studio</h2>
+        </div>
+      </div>
+      <div class="studio-grid">
+        <article class="panel">
+          <span class="card-number">01</span>
+          <h3>Lazy Cleanup</h3>
+          <p>Discover files, extract tasks, categorize documents, and pause for explicit human review.</p>
+          <button class="button primary" data-go="workspace">Configure workspace ↘</button>
+        </article>
+        <article class="panel">
+          <span class="card-number">02</span>
+          <h3>Pipeline Stages</h3>
+          <ol>
+            <li>Inventory files and calculate SHA-256 hashes</li>
+            <li>Extract tasks and profile tabular CSV schemas</li>
+            <li>Generate proposals with collision disambiguation</li>
+            <li>Require explicit selection in Review Center</li>
+            <li>Execute atomic moves with hash-checked rollback</li>
+          </ol>
+        </article>
+      </div>
     </section>
     <section id="review" class="view">
-      <div class="eyebrow">03 / APPROVAL GATE</div><h2>Review Center</h2><p class="muted">Proposals are not completed operations. Select exactly what you want to apply.</p><div id="reviewQueue" class="result empty"><h3>No pending review.</h3><p>Run Lazy Cleanup from Workspace to create a review queue.</p></div>
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">03 / APPROVAL GATE</div>
+          <h2>Review Center</h2>
+        </div>
+      </div>
+      <p class="lede" style="font-size: 15px; margin-bottom: 24px;">Proposals are not completed operations. Select exactly which changes you want to apply.</p>
+      <div id="reviewQueue" class="result empty">
+        <div class="empty-icon">✦</div>
+        <h3>No pending review.</h3>
+        <p>Run a dry-run scan from the Workspace tab to generate review proposals.</p>
+        <button class="button primary" data-go="workspace">Go to Workspace ↘</button>
+      </div>
     </section>
     <section id="csv" class="view">
-      <div class="eyebrow">04 / DATASET INSPECTION</div><h2>CSV Lab</h2><p class="muted">CSV profiling is deterministic and works without an AI provider. Prediction adapters are intentionally not enabled until their licensing and runtime are verified.</p><div id="csvResult" class="result empty"><h3>No dataset profiled.</h3><p>Run a workspace scan containing a CSV file to see its profile here.</p></div>
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">04 / DATASET INSPECTION</div>
+          <h2>CSV Lab</h2>
+        </div>
+      </div>
+      <p class="lede" style="font-size: 15px; margin-bottom: 24px;">CSV profiling is deterministic and operates entirely in TypeScript without third-party cloud APIs.</p>
+      <div id="csvResult" class="result empty">
+        <div class="empty-icon">✦</div>
+        <h3>No dataset profiled.</h3>
+        <p>Run a workspace scan containing a CSV file to inspect row counts, duplicate rows, missing fields, and column types.</p>
+        <button class="button primary" data-go="workspace">Open workspace ↘</button>
+      </div>
     </section>
     <section id="activity" class="view">
-      <div class="eyebrow">05 / EVIDENCE + CONTROL</div><h2>Activity & Settings</h2><div class="settings-grid"><article class="panel"><h3>Model connection</h3><p id="settingsHealth">Checking Ollama…</p><button id="refreshHealth" class="button">Refresh connection</button></article><article class="panel"><h3>Privacy boundary</h3><p>Local mode reads only an authorized path. Hosted mode rejects local path scans and requires an authenticated upload flow, which is not yet implemented.</p></article></div><h3>Execution history</h3><div id="history" class="history"></div>
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">05 / EVIDENCE + CONTROL</div>
+          <h2>Activity & Settings</h2>
+        </div>
+      </div>
+      <div class="settings-grid">
+        <article class="panel">
+          <div class="eyebrow">RUNTIME ENVIRONMENT</div>
+          <h3>Model Connection</h3>
+          <p id="settingsHealth">Checking Ollama…</p>
+          <button id="refreshHealth" class="button">Refresh connection</button>
+        </article>
+        <article class="panel">
+          <div class="eyebrow">SAFETY POLICY</div>
+          <h3>Privacy Boundary</h3>
+          <p>Local mode reads only an authorized path. Hosted mode strictly rejects filesystem operations to protect the server host.</p>
+        </article>
+      </div>
+      <h3 style="font-size: 22px; letter-spacing: -0.02em; margin: 32px 0 16px;">Execution History</h3>
+      <div id="history" class="history"></div>
     </section>
   </main>
-  <footer><span>SlothDesk AI / 2026</span><span>Calm, inspectable automation.</span></footer>
+  <footer>
+    <span>SlothDesk AI / 2026</span>
+    <span>Calm, inspectable automation.</span>
+  </footer>
   <script>
-    const $ = id => document.getElementById(id); let currentExecution = null;
+    const $ = id => document.getElementById(id);
+    let currentExecution = null;
     const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-    const api = async (url, options) => { const response = await fetch(url, options); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Request failed'); return data; };
-    function show(view) { document.querySelectorAll('.view').forEach(x => x.classList.toggle('active', x.id === view)); document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.view === view)); location.hash = view; if (view === 'activity' || view === 'dashboard') loadHistory(); if (view === 'review') renderReview(); }
+    const api = async (url, options) => {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Request failed');
+      return data;
+    };
+    function show(view) {
+      document.querySelectorAll('.view').forEach(x => x.classList.toggle('active', x.id === view));
+      document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.view === view));
+      location.hash = view;
+      if (view === 'activity' || view === 'dashboard') loadHistory();
+      if (view === 'review') renderReview();
+    }
     document.querySelectorAll('.tab').forEach(x => x.onclick = () => show(x.dataset.view));
     document.querySelectorAll('[data-go]').forEach(x => x.onclick = () => show(x.dataset.go));
-    function metric(label, value) { return `<div><b>${value}</b><span>${label}</span></div>`; }
-    async function health() { const data = await api('/api/health'); const text = `${data.model.available ? 'READY' : 'FALLBACK'} · ${data.model.message}`; $('modelBadge').textContent = text; $('settingsHealth').textContent = text; }
-    async function loadHistory() { const data = await api('/api/executions'); const totals = data.reduce((a, x) => ({files:a.files+x.filesProcessed, tasks:a.tasks+x.tasksExtracted, duplicates:a.duplicates+x.duplicates, saved:a.saved+x.estimatedNetMinutesSaved}), {files:0,tasks:0,duplicates:0,saved:0}); $('dashboardMetrics').innerHTML = metric('files processed', totals.files) + metric('tasks extracted', totals.tasks) + metric('duplicates found', totals.duplicates) + metric('estimated minutes saved', totals.saved.toFixed(1)); $('dashboardStatus').textContent = `${data.length} execution${data.length === 1 ? '' : 's'} recorded`; $('recent').innerHTML = data.slice(0,3).map(x => `<article class="panel"><span class="eyebrow">${esc(x.id.slice(0,8))} · ${esc(x.status)}</span><h3>${x.filesProcessed} files / ${x.tasksExtracted} tasks</h3><p>${new Date(x.startedAt).toLocaleString()}</p></article>`).join('') || '<div class="notice">No execution history yet.</div>'; $('history').innerHTML = data.map(x => `<div class="history-row"><b>${esc(x.id.slice(0,8))}</b><span>${x.filesProcessed} files · ${x.estimatedNetMinutesSaved.toFixed(1)} min saved</span><span>${esc(x.status)}</span></div>`).join('') || '<div class="notice">Run a workflow to create evidence.</div>'; }
+    $('brandLink').onclick = e => { e.preventDefault(); show('dashboard'); };
+    $('presetDemo').onclick = () => { $('workspacePath').value = 'demo-workspace'; };
+    function metric(label, value) {
+      return `<div class="metric-item"><b>${value}</b><span>${label}</span></div>`;
+    }
+    async function health() {
+      try {
+        const data = await api('/api/health');
+        const text = `${data.model.available ? 'READY' : 'FALLBACK'} · ${data.model.message}`;
+        $('modelBadge').textContent = text;
+        $('settingsHealth').textContent = text;
+      } catch (err) {
+        $('modelBadge').textContent = 'OFFLINE · Server unreachable';
+        $('settingsHealth').textContent = 'Server unreachable';
+      }
+    }
+    async function loadHistory() {
+      try {
+        const data = await api('/api/executions');
+        const totals = data.reduce((a, x) => ({
+          files: a.files + x.filesProcessed,
+          tasks: a.tasks + x.tasksExtracted,
+          duplicates: a.duplicates + x.duplicates,
+          saved: a.saved + x.estimatedNetMinutesSaved
+        }), { files: 0, tasks: 0, duplicates: 0, saved: 0 });
+        $('dashboardMetrics').innerHTML =
+          metric('Files Processed', totals.files) +
+          metric('Tasks Extracted', totals.tasks) +
+          metric('Duplicates Found', totals.duplicates) +
+          metric('Estimated Net Min Saved', totals.saved.toFixed(1));
+        $('dashboardStatus').textContent = `${data.length} execution${data.length === 1 ? '' : 's'} recorded`;
+        if (data.length === 0) {
+          $('recent').innerHTML = `
+            <div class="card-item" style="grid-column: 1 / -1; text-align: center; padding: 48px 24px;">
+              <div class="empty-icon">✦</div>
+              <h3>Your desk is clear</h3>
+              <p style="margin-bottom: 20px;">No executions have been recorded yet. Enter a workspace folder to inventory files and extract tasks.</p>
+              <button class="button primary" data-go="workspace" onclick="show('workspace')">Open workspace ↘</button>
+            </div>
+          `;
+          $('history').innerHTML = '<div class="notice">No execution records found. Run a workspace scan to generate execution history.</div>';
+        } else {
+          $('recent').innerHTML = data.slice(0, 3).map(x => `
+            <article class="card-item">
+              <span class="eyebrow">${esc(x.id.slice(0, 8))} · ${esc(x.status)}</span>
+              <h3>${x.filesProcessed} files · ${x.tasksExtracted} tasks</h3>
+              <p>${new Date(x.startedAt).toLocaleString()}</p>
+            </article>
+          `).join('');
+          $('history').innerHTML = data.map(x => `
+            <div class="history-row">
+              <b>${esc(x.id.slice(0, 8))}</b>
+              <span>${x.filesProcessed} files · ${x.tasksExtracted} tasks · ${x.estimatedNetMinutesSaved.toFixed(1)} min saved · ${new Date(x.startedAt).toLocaleDateString()}</span>
+              <span class="history-status" style="color: ${x.status === 'completed' ? 'var(--success)' : 'var(--danger)'}">${esc(x.status)}</span>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        $('dashboardStatus').textContent = 'Unable to load history';
+      }
+    }
     function renderReview() {
-      if (!currentExecution) return;
+      if (!currentExecution) {
+        $('reviewQueue').className = 'result empty';
+        $('reviewQueue').innerHTML = `
+          <div class="empty-icon">✦</div>
+          <h3>No pending review.</h3>
+          <p>Run a dry-run scan from the Workspace tab to generate review proposals.</p>
+          <button class="button primary" onclick="show('workspace')">Go to Workspace ↘</button>
+        `;
+        return;
+      }
       const pending = currentExecution.proposals.filter(x => x.status === 'pending');
       const hasCompleted = currentExecution.proposals.some(x => x.status === 'completed');
       $('reviewQueue').className = 'result';
       let html = '';
       if (pending.length) {
-        html += `<div class="proposals">${pending.map(p => `<label><input type="checkbox" value="${p.id}" checked><span>${esc(p.sourcePath.split('/').pop())} → ${esc(p.destinationPath.replace(currentExecution.workspace, ''))}<small>${esc(p.reason)}</small></span></label>`).join('')}</div><button id="approve" class="button primary">Approve selected operations</button>`;
+        html += `<div class="proposals">${pending.map(p => `
+          <label class="proposal-item">
+            <input type="checkbox" value="${p.id}" checked>
+            <span class="proposal-text">
+              <strong>${esc(p.sourcePath.split('/').pop())}</strong> → ${esc(p.destinationPath.replace(currentExecution.workspace, ''))}
+              <small>${esc(p.reason)}</small>
+            </span>
+          </label>
+        `).join('')}</div>`;
       } else {
-        html += '<div class="notice">There are no pending proposals.</div>';
+        html += '<div class="notice">There are no pending proposals in this execution queue.</div>';
+      }
+      html += '<div class="review-actions">';
+      if (pending.length) {
+        html += '<button id="approve" class="button primary">Approve selected operations</button>';
       }
       if (hasCompleted) {
-        html += `<button id="rollback" class="button danger">Rollback completed operations</button>`;
+        html += '<button id="rollback" class="button danger">Rollback completed operations</button>';
       }
+      html += '</div>';
       $('reviewQueue').innerHTML = html;
-      const approve = $('approve'); if (approve) approve.onclick = approveSelected;
-      const rollback = $('rollback'); if (rollback) rollback.onclick = rollbackCurrent;
+      const approve = $('approve');
+      if (approve) approve.onclick = approveSelected;
+      const rollback = $('rollback');
+      if (rollback) rollback.onclick = rollbackCurrent;
     }
-    async function approveSelected() { const ids = [...document.querySelectorAll('#reviewQueue input:checked')].map(x => x.value); const data = await api('/api/approve', {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({executionId:currentExecution.id, approvedIds:ids})}); currentExecution.proposals.forEach(p => { if (data.results.some(r => r.id === p.id && r.status === 'completed')) p.status = 'completed'; }); renderReview(); loadHistory(); }
-    async function rollbackCurrent() { const data = await api('/api/rollback', {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({executionId:currentExecution.id})}); currentExecution.proposals.forEach(p => { if (data.results.some(r => r.status === 'rolled_back')) p.status = 'pending'; }); renderReview(); $('reviewQueue').insertAdjacentHTML('afterbegin', `<div class="notice">${data.results.filter(r => r.status === 'rolled_back').length} operation(s) rolled back.</div>`); loadHistory(); }
-    $('run').onclick = async () => { const workspace = $('workspacePath').value.trim(); if (!workspace) { $('scanResult').innerHTML = '<div class="notice error">Enter an authorized workspace path.</div>'; return; } $('run').disabled = true; $('run').textContent = 'Scanning…'; try { currentExecution = await api('/api/cleanup', {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({workspace})}); $('scanResult').className = 'result'; $('scanResult').innerHTML = `<div class="result-top"><div><div class="eyebrow">EXECUTION ${esc(currentExecution.id.slice(0,8))}</div><h3>${currentExecution.filesProcessed} files inventoried</h3></div><div class="saved">~${currentExecution.estimatedNetMinutesSaved.toFixed(1)} min <small>estimated net saved</small></div></div><div class="metrics">${metric('tasks',currentExecution.tasksExtracted)}${metric('duplicates',currentExecution.duplicates)}${metric('proposals',currentExecution.proposals.length)}${metric('errors',currentExecution.errors.length)}</div><div class="reports">${currentExecution.reports.map(r => `<article><strong>${esc(r.source)}</strong><span>${esc(r.category)} · ${esc(r.provider)}</span><p>${esc(r.summary)}</p>${r.tasks.length ? `<b>Tasks</b><ul>${r.tasks.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}</article>`).join('')}</div><button class="button primary" id="openReview">Open Review Center</button>`; $('openReview').onclick = () => show('review'); const csv = currentExecution.reports.find(r => r.category === 'Dataset'); if (csv) { $('csvResult').className = 'result'; $('csvResult').innerHTML = `<h3>${esc(csv.source)}</h3><p>${esc(csv.summary)}</p><p class="muted">Columns: ${csv.facts.map(esc).join(', ')}</p>`; } loadHistory(); } catch (error) { $('scanResult').innerHTML = `<div class="notice error">${esc(error.message)}</div>`; } finally { $('run').disabled = false; $('run').textContent = 'Run dry-run scan'; } };
-    $('refreshHealth').onclick = () => health(); health(); loadHistory(); if (location.hash) show(location.hash.slice(1));
+    async function approveSelected() {
+      const btn = $('approve');
+      if (btn) { btn.disabled = true; btn.textContent = 'Applying changes…'; }
+      try {
+        const ids = [...document.querySelectorAll('#reviewQueue input:checked')].map(x => x.value);
+        const data = await api('/api/approve', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ executionId: currentExecution.id, approvedIds: ids })
+        });
+        currentExecution.proposals.forEach(p => {
+          if (data.results.some(r => r.id === p.id && r.status === 'completed')) p.status = 'completed';
+        });
+        renderReview();
+        loadHistory();
+      } catch (err) {
+        $('reviewQueue').insertAdjacentHTML('afterbegin', `<div class="notice error">${esc(err.message)}</div>`);
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Approve selected operations'; }
+      }
+    }
+    async function rollbackCurrent() {
+      const btn = $('rollback');
+      if (btn) { btn.disabled = true; btn.textContent = 'Rolling back…'; }
+      try {
+        const data = await api('/api/rollback', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ executionId: currentExecution.id })
+        });
+        currentExecution.proposals.forEach(p => {
+          if (data.results.some(r => r.status === 'rolled_back')) p.status = 'pending';
+        });
+        renderReview();
+        const count = data.results.filter(r => r.status === 'rolled_back').length;
+        $('reviewQueue').insertAdjacentHTML('afterbegin', `<div class="notice success">${count} operation(s) successfully rolled back.</div>`);
+        loadHistory();
+      } catch (err) {
+        $('reviewQueue').insertAdjacentHTML('afterbegin', `<div class="notice error">${esc(err.message)}</div>`);
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Rollback completed operations'; }
+      }
+    }
+    $('run').onclick = async () => {
+      const workspace = $('workspacePath').value.trim();
+      if (!workspace) {
+        $('scanResult').innerHTML = '<div class="notice error">Enter an authorized workspace path before scanning.</div>';
+        return;
+      }
+      $('run').disabled = true;
+      $('run').textContent = 'Scanning workspace…';
+      try {
+        currentExecution = await api('/api/cleanup', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ workspace })
+        });
+        $('scanResult').className = 'result';
+        $('scanResult').innerHTML = `
+          <div class="result-top">
+            <div>
+              <div class="eyebrow">EXECUTION ${esc(currentExecution.id.slice(0, 8))}</div>
+              <h3>${currentExecution.filesProcessed} files inventoried</h3>
+            </div>
+            <div class="saved-pill">
+              ~${currentExecution.estimatedNetMinutesSaved.toFixed(1)} min
+              <small>estimated net saved</small>
+            </div>
+          </div>
+          <div class="metrics">
+            ${metric('Tasks', currentExecution.tasksExtracted)}
+            ${metric('Duplicates', currentExecution.duplicates)}
+            ${metric('Proposals', currentExecution.proposals.length)}
+            ${metric('Errors', currentExecution.errors.length)}
+          </div>
+          <div class="reports">
+            ${currentExecution.reports.map(r => `
+              <article class="report-item">
+                <span class="report-tag">${esc(r.category)} · ${esc(r.provider)}</span>
+                <strong>${esc(r.source)}</strong>
+                <p>${esc(r.summary)}</p>
+                ${r.tasks.length ? `<strong>Tasks</strong><ul>${r.tasks.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
+              </article>
+            `).join('')}
+          </div>
+          <button class="button primary" id="openReview">Open Review Center ↘</button>
+        `;
+        $('openReview').onclick = () => show('review');
+        const csv = currentExecution.reports.find(r => r.category === 'Dataset');
+        if (csv) {
+          $('csvResult').className = 'result';
+          $('csvResult').innerHTML = `
+            <div class="eyebrow">DATASET REPORT</div>
+            <h3 style="font-size: 26px; margin: 0 0 12px;">${esc(csv.source)}</h3>
+            <p style="font-size: 15px; margin-bottom: 20px;">${esc(csv.summary)}</p>
+            <div class="panel" style="background: var(--cream);">
+              <div class="eyebrow">DETECTED COLUMNS</div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                ${csv.facts.map(f => `<span class="report-tag" style="background: var(--surface-white);">${esc(f)}</span>`).join('')}
+              </div>
+            </div>
+          `;
+        }
+        loadHistory();
+      } catch (err) {
+        $('scanResult').innerHTML = `<div class="notice error">${esc(err.message)}</div>`;
+      } finally {
+        $('run').disabled = false;
+        $('run').textContent = 'Run dry-run scan';
+      }
+    };
+    $('refreshHealth').onclick = () => health();
+    health();
+    loadHistory();
+    if (location.hash) show(location.hash.slice(1));
   </script>
 </body>
 </html>

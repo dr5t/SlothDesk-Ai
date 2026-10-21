@@ -45,6 +45,7 @@ test("adversarial: rollback cannot overwrite a file created at original path aft
 
   const execution = await runCleanup(ws);
   const move = execution.proposals.find(p => p.sourcePath === notesPath);
+  if (!move) throw new Error("Expected move proposal was not found");
   assert.ok(move);
   const approveRes = await approveOperations(execution, [move.id]);
   assert.equal(approveRes[0].status, "completed");
@@ -69,6 +70,7 @@ test("adversarial: rollback cannot overwrite when destination file was modified 
 
   const execution = await runCleanup(ws);
   const move = execution.proposals.find(p => p.sourcePath === notesPath);
+  if (!move) throw new Error("Expected move proposal was not found");
   assert.ok(move);
   const approveRes = await approveOperations(execution, [move.id]);
   assert.equal(approveRes[0].status, "completed");
@@ -91,6 +93,7 @@ test("adversarial: server-authoritative approval rejects forged or reused IDs", 
 
   const execution = await runCleanup(ws);
   const move = execution.proposals[0];
+  if (!move) throw new Error("Expected move proposal was not found");
   assert.ok(move);
 
   await assert.rejects(
@@ -142,6 +145,7 @@ test("adversarial: broken symlink at destination prevents overwriting", async ()
 
   const execution = await runCleanup(ws);
   const move = execution.proposals[0];
+  if (!move) throw new Error("Expected move proposal was not found");
   assert.ok(move);
 
   await mkdir(path.dirname(move.destinationPath), { recursive: true });
@@ -188,6 +192,8 @@ test("adversarial: persistence and operation journals remain consistent across r
 
   const execution = await runCleanup(ws);
   const move = execution.proposals[0];
+  if (!move) throw new Error("Expected move proposal was not found");
+  assert.ok(move);
   const approveRes = await approveOperations(execution, [move.id]);
   assert.equal(approveRes[0].status, "completed");
 

@@ -41,6 +41,7 @@ test("approved moves are journaled and can be rolled back", async () => {
   await writeFile(path.join(workspace, "notes.txt"), "TODO: review the launch plan");
   const execution = await runCleanup(workspace);
   const move = execution.proposals.find((item) => item.sourcePath.endsWith("notes.txt"));
+  if (!move) throw new Error("Expected proposal for notes.txt was not found");
   assert.ok(move);
   const result = await approveOperations(execution, [move.id]);
   assert.equal(result[0].status, "completed");
