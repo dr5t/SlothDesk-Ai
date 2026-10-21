@@ -55,5 +55,7 @@ export interface OperationJournalEntry {
   sourcePath: string;
   destinationPath: string;
   completedAt: string;
+  fileHash?: string;
   rolledBackAt?: string;
 }
+

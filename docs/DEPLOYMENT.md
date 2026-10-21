@@ -25,3 +25,5 @@ The current app writes execution history to `.data/`. Render services have ephem
 | `OLLAMA_BASE_URL` | `http://127.0.0.1:11434` | Ollama endpoint |
 | `OLLAMA_MODEL` | `gemma3:4b` | Configured Gemma model identifier |
 | `MAX_FILE_BYTES` | `1048576` | Per-file scan limit |
+| `DATA_DIR` | `.data` | Directory for execution history and operation journals |
+
