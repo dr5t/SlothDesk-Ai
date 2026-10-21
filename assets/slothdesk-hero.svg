@@ -18,18 +18,16 @@
       <path d="M50 46 L50 50 L46 50" stroke="#252321" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M15 32 C15 19 22 13 30 13 C38 13 45 19 45 32 C45 44 38 49 30 49 C22 49 15 44 15 32 Z" fill="#f5f0e8" stroke="#252321" stroke-width="2"/>
       <path d="M19 32 C19 22 23 16 30 16 C37 16 41 22 41 32 C41 42 37 46 30 46 C23 46 19 42 19 32 Z" fill="#fffaf2"/>
-      <path d="M18 26.5 C21 24.5 25.5 26.5 26.5 30.5 C27.5 35 24.5 38.5 21.5 38 C18.5 37.5 16 32 18 26.5 Z" fill="#252321"/>
-      <path d="M42 26.5 C39 24.5 34.5 26.5 33.5 30.5 C32.5 35 35.5 38.5 38.5 38 C41.5 37.5 44 32 42 26.5 Z" fill="#252321"/>
-      <ellipse cx="22" cy="31" rx="3.6" ry="2.8" fill="#f25c2a"/>
-      <ellipse cx="38" cy="31" rx="3.6" ry="2.8" fill="#f25c2a"/>
-      <circle cx="22" cy="31" r="1.5" fill="#252321"/>
-      <circle cx="38" cy="31" r="1.5" fill="#252321"/>
-      <circle cx="22.8" cy="30.2" r="0.6" fill="#ffffff"/>
-      <circle cx="38.8" cy="30.2" r="0.6" fill="#ffffff"/>
+      <path d="M17 28 C18 25.5 25 26.5 27.5 30.5 C26.5 34 21.5 35.5 18.5 33.5 C17 32 16.5 30 17 28 Z" fill="#252321"/>
+      <path d="M43 28 C42 25.5 35 26.5 32.5 30.5 C33.5 34 38.5 35.5 41.5 33.5 C43 32 43.5 30 43 28 Z" fill="#252321"/>
+      <ellipse cx="22.8" cy="31.3" rx="3.5" ry="2.8" fill="#f25c2a"/>
+      <ellipse cx="37.2" cy="31.3" rx="3.5" ry="2.8" fill="#f25c2a"/>
+      <circle cx="22.8" cy="31.3" r="1.0" fill="#252321"/>
+      <circle cx="37.2" cy="31.3" r="1.0" fill="#252321"/>
+      <circle cx="23.9" cy="30.4" r="0.7" fill="#ffffff"/>
+      <circle cx="38.3" cy="30.4" r="0.7" fill="#ffffff"/>
       <ellipse cx="30" cy="37" rx="3" ry="2" fill="#252321"/>
       <path d="M28 41 Q30 43 32 41" stroke="#252321" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-      <path d="M20 24 Q22.5 22.5 25 24" stroke="#f25c2a" stroke-width="1" stroke-linecap="round" fill="none"/>
-      <path d="M35 24 Q37.5 22.5 40 24" stroke="#f25c2a" stroke-width="1" stroke-linecap="round" fill="none"/>
     </g>
     
     <text x="76" y="36" fill="#252321" font-family="'Space Grotesk', -apple-system, sans-serif" font-size="28" font-weight="900" letter-spacing="0.04em">SLOTHDESK</text>
