@@ -690,6 +690,134 @@ main {
   margin-bottom: 4px;
 }
 
+.report-header {
+  margin-bottom: 8px;
+}
+
+.report-subheading {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  margin: 12px 0 4px;
+}
+
+.report-section {
+  margin-top: 10px;
+}
+
+.task-list,
+.decision-list,
+.deadline-list {
+  margin: 4px 0 10px;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.evidence-box {
+  border-top: 1px dashed #d4cdbf;
+  padding-top: 8px;
+  margin-top: 12px;
+}
+
+.evidence-list {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.evidence-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.evidence-line {
+  font-family: monospace;
+  font-weight: 900;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  padding: 1px 5px;
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.evidence-item {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.evidence-excerpt {
+  color: var(--ink-muted);
+  font-style: italic;
+}
+
+.linked-proposal-box {
+  border: 1px solid var(--line);
+  background: var(--cream);
+  padding: 10px 12px;
+  margin-top: 14px;
+  box-shadow: 1px 1px 0 var(--line);
+}
+
+.linked-proposal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.button.small {
+  padding: 6px 12px;
+  font-size: 11px;
+  min-height: 32px;
+  box-shadow: 2px 2px 0 var(--line);
+}
+
+.button.small:active:not(:disabled),
+.button.small.pressed:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 var(--line);
+}
+
+.proposal-item.highlighted {
+  outline: 3px solid var(--orange);
+  outline-offset: 2px;
+  background: var(--orange-light);
+}
+
+.proposal-source {
+  display: block;
+  font-size: 11px;
+  color: var(--orange);
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+.report-tag.provider-model {
+  background: var(--orange-light);
+  border-color: var(--orange);
+  color: var(--orange-hover);
+}
+
+.report-tag.provider-det {
+  background: #ede6da;
+  border-color: var(--line);
+  color: var(--ink);
+}
+
 .studio-grid,
 .settings-grid {
   display: grid;

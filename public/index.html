@@ -502,6 +502,17 @@
         $('dashboardStatus').textContent = 'Unable to load history';
       }
     }
+    function openProposalInReview(id) {
+      show('review');
+      setTimeout(() => {
+        const el = document.getElementById('proposal-' + id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('highlighted');
+          setTimeout(() => el.classList.remove('highlighted'), 2400);
+        }
+      }, 80);
+    }
     function renderReview() {
       if (!currentExecution) {
         $('reviewQueue').className = 'result empty';
@@ -519,11 +530,12 @@
       let html = '';
       if (pending.length) {
         html += `<div class="proposals">${pending.map(p => `
-          <label class="proposal-item">
+          <label class="proposal-item" id="proposal-${p.id}">
             <input type="checkbox" value="${p.id}" checked>
             <span class="proposal-text">
               <strong>${esc(p.sourcePath.split('/').pop())}</strong> → ${esc(p.destinationPath.replace(currentExecution.workspace, ''))}
               <small>${esc(p.reason)}</small>
+              ${p.reportSource ? `<small class="proposal-source">Source Document: <strong>${esc(p.reportSource)}</strong></small>` : ''}
             </span>
           </label>
         `).join('')}</div>`;
@@ -620,14 +632,63 @@
             ${metric('Errors', currentExecution.errors.length)}
           </div>
           <div class="reports">
-            ${currentExecution.reports.map(r => `
-              <article class="report-item">
-                <span class="report-tag">${esc(r.category)} · ${esc(r.provider)}</span>
-                <strong>${esc(r.source)}</strong>
-                <p>${esc(r.summary)}</p>
-                ${r.tasks.length ? `<strong>Tasks</strong><ul>${r.tasks.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
+            ${currentExecution.reports.map(r => {
+              const linkedProposal = currentExecution.proposals.find(p => p.id === r.proposalId);
+              const providerLabel = r.provider === 'ollama' ? 'OPEN-WEIGHT MODEL · GEMMA 3' : 'DETERMINISTIC ANALYSIS';
+              const providerClass = r.provider === 'ollama' ? 'provider-model' : 'provider-det';
+              return `
+              <article class="report-item" id="report-${esc(r.source.replace(/[^a-zA-Z0-9]/g, '-'))}">
+                <div class="report-header">
+                  <span class="report-tag ${providerClass}">${esc(r.category)} · ${providerLabel}</span>
+                  <strong>${esc(r.source)}</strong>
+                </div>
+                <div class="report-summary">
+                  <div class="report-subheading">SUMMARY</div>
+                  <p>${esc(r.summary)}</p>
+                </div>
+                ${r.tasks && r.tasks.length ? `
+                  <div class="report-section">
+                    <div class="report-subheading">ACTIONABLE TASKS (${r.tasks.length})</div>
+                    <ul class="task-list">${r.tasks.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
+                  </div>
+                ` : ''}
+                ${r.decisions && r.decisions.length ? `
+                  <div class="report-section">
+                    <div class="report-subheading">DECISIONS (${r.decisions.length})</div>
+                    <ul class="decision-list">${r.decisions.map(d => `<li>${esc(d)}</li>`).join('')}</ul>
+                  </div>
+                ` : ''}
+                ${r.deadlines && r.deadlines.length ? `
+                  <div class="report-section">
+                    <div class="report-subheading">DEADLINES (${r.deadlines.length})</div>
+                    <ul class="deadline-list">${r.deadlines.map(d => `<li>${esc(d)}</li>`).join('')}</ul>
+                  </div>
+                ` : ''}
+                ${r.evidence && r.evidence.length ? `
+                  <div class="report-section evidence-box">
+                    <div class="report-subheading">SOURCE EVIDENCE & LINE REFERENCES</div>
+                    <ul class="evidence-list">
+                      ${r.evidence.map(e => `
+                        <li>
+                          <span class="evidence-line">L${e.line || '—'}</span>
+                          <span class="evidence-item">${esc(e.item)}</span>
+                          ${e.excerpt && e.excerpt !== e.item ? `<span class="evidence-excerpt">“${esc(e.excerpt)}”</span>` : ''}
+                        </li>
+                      `).join('')}
+                    </ul>
+                  </div>
+                ` : ''}
+                ${linkedProposal ? `
+                  <div class="linked-proposal-box">
+                    <div class="report-subheading">CORRESPONDING REVIEWABLE ACTION</div>
+                    <div class="linked-proposal-row">
+                      <span><strong>Proposed Move:</strong> ${esc(linkedProposal.sourcePath.split('/').pop())} → ${esc(linkedProposal.destinationPath.replace(currentExecution.workspace, ''))}</span>
+                      <button class="button small" onclick="openProposalInReview('${linkedProposal.id}')">Review in Approval Gate ↘</button>
+                    </div>
+                  </div>
+                ` : ''}
               </article>
-            `).join('')}
+            `;}).join('')}
           </div>
           <button class="button primary" id="openReview">Open Review Center ↘</button>
         `;

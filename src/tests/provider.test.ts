@@ -202,3 +202,25 @@ test("provider: sanitizeProviderError redacts local paths and secrets without st
   assert.equal(cleanSecret.includes("secret12345"), false);
   assert.equal(cleanSecret.includes("mykey"), false);
 });
+
+test("provider: analyze on empty document directly returns fallbackReport without model call", async () => {
+  const provider = new OllamaProvider("http://127.0.0.1:9999", "gemma3:4b");
+  const report = await provider.analyze("empty.txt", "");
+  assert.equal(report.provider, "deterministic");
+  assert.equal(report.summary, "No extractable text was found.");
+  assert.deepEqual(report.tasks, []);
+  assert.deepEqual(report.decisions, []);
+  assert.deepEqual(report.deadlines, []);
+  assert.deepEqual(report.evidence, []);
+});
+
+test("provider: grounded source evidence matches lines in analyzed text", async () => {
+  const provider = new OllamaProvider("http://127.0.0.1:9999", "gemma3:4b");
+  const text = "Intro line\nTODO: write tests for Hacktoberfest\nDecided on local first\nDone";
+  const report = await provider.analyze("notes.md", text);
+  assert.equal(report.provider, "deterministic");
+  assert.ok(report.evidence && report.evidence.length >= 2);
+  const taskEvidence = report.evidence.find((e) => e.item.includes("TODO"));
+  assert.ok(taskEvidence);
+  assert.equal(taskEvidence.line, 2);
+});

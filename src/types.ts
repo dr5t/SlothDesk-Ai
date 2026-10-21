@@ -22,12 +22,19 @@ export interface FileRecord {
   duplicateOf?: string;
 }
 
+export interface SourceEvidence {
+  item: string;
+  excerpt: string;
+  line: number;
+}
+
 export interface Proposal {
   id: string;
   sourcePath: string;
   destinationPath: string;
   reason: string;
   status: "pending" | "approved" | "rejected" | "completed" | "failed";
+  reportSource?: string;
 }
 
 export interface DocumentReport {
@@ -40,6 +47,8 @@ export interface DocumentReport {
   category: string;
   suggestedName: string;
   provider: "ollama" | "deterministic";
+  evidence?: SourceEvidence[];
+  proposalId?: string;
 }
 
 export interface Execution {

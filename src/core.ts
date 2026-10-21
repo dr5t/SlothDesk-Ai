@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import type { FileRecord, SupportedFileType } from "./types.js";
+import type { FileRecord, SourceEvidence, SupportedFileType } from "./types.js";
 
 const extensions: Record<string, SupportedFileType> = {
   ".txt": "text",
@@ -66,11 +66,37 @@ export async function scanWorkspace(workspace: string, maxBytes = 1_048_576): Pr
 }
 
 export function extractDeterministicSignals(text: string) {
-  const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
-  const tasks = lines.filter((line) => /^(?:[-*]\s*)?(todo|task|action|follow[- ]?up)\b/i.test(line));
-  const decisions = lines.filter((line) => /\b(decided|decision|agreed|approved)\b/i.test(line));
-  const deadlines = lines.filter((line) => /\b(?:by|due|deadline)\b.*\b(?:\d{1,2}[/-]\d{1,2}|monday|tuesday|wednesday|thursday|friday|next week|tomorrow)\b/i.test(line));
-  return { lines, tasks, decisions, deadlines };
+  if (typeof text !== "string") {
+    return { lines: [], tasks: [], decisions: [], deadlines: [], evidence: [] };
+  }
+  const rawLines = text.split(/\r?\n/);
+  const lines: string[] = [];
+  const tasks: string[] = [];
+  const decisions: string[] = [];
+  const deadlines: string[] = [];
+  const evidence: SourceEvidence[] = [];
+
+  rawLines.forEach((raw, idx) => {
+    const trimmed = raw.trim();
+    if (!trimmed) return;
+    const lineNum = idx + 1;
+    lines.push(trimmed);
+
+    if (/^(?:[-*]\s*)?(todo|task|action|follow[- ]?up)\b/i.test(trimmed)) {
+      tasks.push(trimmed);
+      evidence.push({ item: trimmed, excerpt: trimmed.slice(0, 160), line: lineNum });
+    }
+    if (/\b(decided|decision|agreed|approved)\b/i.test(trimmed)) {
+      decisions.push(trimmed);
+      evidence.push({ item: trimmed, excerpt: trimmed.slice(0, 160), line: lineNum });
+    }
+    if (/\b(?:by|due|deadline)\b.*\b(?:\d{1,2}[/-]\d{1,2}|monday|tuesday|wednesday|thursday|friday|next week|tomorrow)\b/i.test(trimmed)) {
+      deadlines.push(trimmed);
+      evidence.push({ item: trimmed, excerpt: trimmed.slice(0, 160), line: lineNum });
+    }
+  });
+
+  return { lines, tasks, decisions, deadlines, evidence };
 }
 
 export function csvProfile(text: string) {

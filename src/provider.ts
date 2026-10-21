@@ -1,26 +1,55 @@
-import type { DocumentReport, ProviderHealth } from "./types.js";
+import type { DocumentReport, ProviderHealth, SourceEvidence } from "./types.js";
 import { extractDeterministicSignals } from "./core.js";
 
-export { ProviderHealth };
+export { ProviderHealth, SourceEvidence };
 
 export interface ModelProvider {
   health(): Promise<ProviderHealth>;
   analyze(source: string, text: string): Promise<DocumentReport>;
 }
 
+function findEvidenceInText(items: string[], text: string): SourceEvidence[] {
+  if (!text || typeof text !== "string") return [];
+  const rawLines = text.split(/\r?\n/);
+  const evidence: SourceEvidence[] = [];
+  const seen = new Set<string>();
+
+  for (const item of items) {
+    if (!item || typeof item !== "string") continue;
+    const cleanItem = item.trim().toLowerCase();
+    if (!cleanItem || seen.has(cleanItem)) continue;
+    seen.add(cleanItem);
+
+    for (let i = 0; i < rawLines.length; i++) {
+      const line = rawLines[i]?.trim() ?? "";
+      if (!line) continue;
+      const lowerLine = line.toLowerCase();
+      if (lowerLine.includes(cleanItem) || cleanItem.includes(lowerLine)) {
+        evidence.push({ item, excerpt: line.slice(0, 160), line: i + 1 });
+        break;
+      }
+    }
+  }
+  return evidence;
+}
+
 function fallbackReport(source: string, text: string): DocumentReport {
   const signals = extractDeterministicSignals(text);
   const title = source.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ").trim();
+  const summary = signals.lines.length > 0
+    ? signals.lines.slice(0, 3).join(" ").slice(0, 360)
+    : "No extractable text was found.";
   return {
     source,
-    summary: signals.lines.slice(0, 3).join(" ").slice(0, 360) || "No extractable text was found.",
+    summary,
     facts: signals.lines.slice(0, 5),
     tasks: signals.tasks,
     decisions: signals.decisions,
     deadlines: signals.deadlines,
     category: signals.tasks.length || signals.deadlines.length ? "Actionable" : "Reference",
     suggestedName: `${title || "document"}.md`,
-    provider: "deterministic"
+    provider: "deterministic",
+    evidence: signals.evidence
   };
 }
 
@@ -107,6 +136,9 @@ export class OllamaProvider implements ModelProvider {
   }
 
   async analyze(source: string, text: string): Promise<DocumentReport> {
+    if (typeof text !== "string" || !text.trim()) {
+      return fallbackReport(source, text);
+    }
     const status = await this.health();
     if (!status.available) {
       this.lastUsedProvider = "deterministic";
@@ -125,6 +157,11 @@ export class OllamaProvider implements ModelProvider {
       const payload = (await response.json()) as { response?: string };
       const value = JSON.parse(payload.response ?? "{}") as Partial<DocumentReport>;
       if (typeof value.summary !== "string" || !Array.isArray(value.tasks)) throw new Error("Invalid model schema");
+      const tasks = (value.tasks ?? []).filter((t): t is string => typeof t === "string");
+      const decisions = (value.decisions ?? []).filter((d): d is string => typeof d === "string");
+      const deadlines = (value.deadlines ?? []).filter((d): d is string => typeof d === "string");
+      const evidence = findEvidenceInText([...tasks, ...decisions, ...deadlines], text);
+
       this.inferenceVerified = true;
       this.lastUsedProvider = "ollama";
       this.lastInferenceAt = new Date().toISOString();
@@ -133,12 +170,13 @@ export class OllamaProvider implements ModelProvider {
         source,
         summary: value.summary,
         facts: value.facts ?? [],
-        tasks: value.tasks,
-        decisions: value.decisions ?? [],
-        deadlines: value.deadlines ?? [],
+        tasks,
+        decisions,
+        deadlines,
         category: value.category ?? "Reference",
         suggestedName: value.suggestedName ?? source,
-        provider: "ollama"
+        provider: "ollama",
+        evidence
       };
     } catch (err) {
       this.lastError = sanitizeProviderError(err);

@@ -65,7 +65,13 @@ export async function runCleanup(workspace: string, provider: ModelProvider = de
         }
 
         usedDestinations.add(candidateDest);
-        proposals.push(proposal(record.path, candidateDest, "Category suggested from document signals."));
+        const p = proposal(record.path, candidateDest, "Category suggested from document signals.");
+        p.reportSource = record.relativePath;
+        proposals.push(p);
+        const lastReport = reports.at(-1);
+        if (lastReport) {
+          lastReport.proposalId = p.id;
+        }
       }
     } catch (error) {
       errors.push(`${record.relativePath}: ${error instanceof Error ? error.message : "Unable to process file"}`);
@@ -73,7 +79,13 @@ export async function runCleanup(workspace: string, provider: ModelProvider = de
   }
 
   for (const record of records.filter((item) => item.duplicateOf)) {
-    proposals.push(proposal(record.path, record.path, `Duplicate of ${record.duplicateOf}; review before removal.`));
+    const p = proposal(record.path, record.path, `Duplicate of ${record.duplicateOf}; review before removal.`);
+    p.reportSource = record.relativePath;
+    proposals.push(p);
+    const rep = reports.find((item) => item.source === record.relativePath);
+    if (rep && !rep.proposalId) {
+      rep.proposalId = p.id;
+    }
   }
 
   const automatedMinutes = (Date.now() - started) / 60_000;
