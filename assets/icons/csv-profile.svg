@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none">
+  <rect x="5" y="5" width="38" height="38" rx="8" fill="#252321"/>
+  <rect x="3" y="3" width="38" height="38" rx="8" fill="#f5f0e8" stroke="#252321" stroke-width="2"/>
+  <rect x="10" y="10" width="28" height="26" rx="2" fill="#ffffff" stroke="#252321" stroke-width="2"/>
+  <rect x="10" y="10" width="28" height="7" fill="#f5f0e8" stroke="#252321" stroke-width="1.5"/>
+  <line x1="20" y1="10" x2="20" y2="36" stroke="#252321" stroke-width="1.5"/>
+  <line x1="29" y1="10" x2="29" y2="36" stroke="#252321" stroke-width="1.5"/>
+  <line x1="10" y1="23" x2="38" y2="23" stroke="#252321" stroke-width="1.5"/>
+  <line x1="10" y1="29" x2="38" y2="29" stroke="#252321" stroke-width="1.5"/>
+  <rect x="13" y="25" width="4" height="2" fill="#f25c2a"/>
+  <rect x="23" y="25" width="3" height="2" fill="#252321"/>
+  <rect x="32" y="25" width="4" height="2" fill="#f25c2a"/>
+  <rect x="13" y="31" width="5" height="2" fill="#252321"/>
+  <rect x="23" y="31" width="4" height="2" fill="#f25c2a"/>
+</svg>

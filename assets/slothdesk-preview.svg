@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="960" height="560" fill="none">
+  <rect x="10" y="10" width="940" height="540" rx="14" fill="#252321"/>
+  <rect x="6" y="6" width="940" height="540" rx="14" fill="#fffaf2" stroke="#252321" stroke-width="3"/>
+
+  <rect x="6" y="6" width="940" height="42" rx="14" fill="#f5f0e8"/>
+  <rect x="6" y="32" width="940" height="16" fill="#f5f0e8"/>
+  <line x1="6" y1="48" x2="946" y2="48" stroke="#252321" stroke-width="2"/>
+  
+  <circle cx="28" cy="27" r="5" fill="#f25c2a"/>
+  <circle cx="44" cy="27" r="5" fill="#252321"/>
+  <circle cx="60" cy="27" r="5" fill="#5c5752"/>
+  
+  <text x="82" y="32" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="13" font-weight="800">SlothDesk AI</text>
+  <text x="176" y="32" fill="#5c5752" font-family="'Space Mono', monospace" font-size="11">localhost:3147</text>
+  
+  <rect x="670" y="16" width="260" height="22" rx="4" fill="#ffffff" stroke="#252321" stroke-width="1.2"/>
+  <circle cx="682" cy="27" r="3.5" fill="#10b981"/>
+  <text x="694" y="31" fill="#252321" font-family="'Space Mono', monospace" font-size="9.5" font-weight="700">READY · Local model (Gemma 3:4b)</text>
+
+  <g transform="translate(24, 62)">
+    <rect x="2" y="2" width="108" height="32" rx="6" fill="#252321"/>
+    <rect x="0" y="0" width="108" height="32" rx="6" fill="#ffffff" stroke="#252321" stroke-width="2"/>
+    <text x="54" y="21" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="700" text-anchor="middle">Workspace</text>
+
+    <g transform="translate(120, 0)">
+      <rect x="3" y="3" width="138" height="32" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="138" height="32" rx="6" fill="#f25c2a" stroke="#252321" stroke-width="2"/>
+      <text x="69" y="21" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="800" text-anchor="middle">Review Center (3)</text>
+    </g>
+
+    <g transform="translate(270, 0)">
+      <rect x="2" y="2" width="96" height="32" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="96" height="32" rx="6" fill="#ffffff" stroke="#252321" stroke-width="2"/>
+      <text x="48" y="21" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="700" text-anchor="middle">CSV Lab</text>
+    </g>
+
+    <g transform="translate(378, 0)">
+      <rect x="2" y="2" width="144" height="32" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="144" height="32" rx="6" fill="#ffffff" stroke="#252321" stroke-width="2"/>
+      <text x="72" y="21" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="700" text-anchor="middle">Activity &amp; Settings</text>
+    </g>
+  </g>
+
+  <g transform="translate(24, 110)">
+    <g transform="translate(0, 0)">
+      <rect x="2" y="2" width="216" height="54" rx="8" fill="#252321"/>
+      <rect x="0" y="0" width="216" height="54" rx="8" fill="#ffffff" stroke="#252321" stroke-width="2"/>
+      <text x="14" y="24" fill="#5c5752" font-family="'Space Mono', monospace" font-size="9.5" font-weight="700">WORKSPACE ITEMS</text>
+      <text x="14" y="44" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="18" font-weight="900">4 Scanned</text>
+    </g>
+
+    <g transform="translate(232, 0)">
+      <rect x="2" y="2" width="216" height="54" rx="8" fill="#252321"/>
+      <rect x="0" y="0" width="216" height="54" rx="8" fill="#f5f0e8" stroke="#f25c2a" stroke-width="2"/>
+      <text x="14" y="24" fill="#f25c2a" font-family="'Space Mono', monospace" font-size="9.5" font-weight="700">EXACT DUPLICATES</text>
+      <text x="14" y="44" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="18" font-weight="900">1 SHA-256 Match</text>
+    </g>
+
+    <g transform="translate(464, 0)">
+      <rect x="2" y="2" width="216" height="54" rx="8" fill="#252321"/>
+      <rect x="0" y="0" width="216" height="54" rx="8" fill="#ffffff" stroke="#252321" stroke-width="2"/>
+      <text x="14" y="24" fill="#5c5752" font-family="'Space Mono', monospace" font-size="9.5" font-weight="700">EXTRACTED SIGNALS</text>
+      <text x="14" y="44" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="18" font-weight="900">3 Tasks &amp; Decisions</text>
+    </g>
+
+    <g transform="translate(696, 0)">
+      <rect x="2" y="2" width="216" height="54" rx="8" fill="#252321"/>
+      <rect x="0" y="0" width="216" height="54" rx="8" fill="#ffffff" stroke="#252321" stroke-width="2"/>
+      <text x="14" y="24" fill="#5c5752" font-family="'Space Mono', monospace" font-size="9.5" font-weight="700">ESTIMATED TIME SAVED</text>
+      <text x="14" y="44" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="18" font-weight="900">~12 Minutes</text>
+    </g>
+  </g>
+
+  <g transform="translate(24, 180)">
+    <g transform="translate(0, 0)">
+      <rect x="3" y="3" width="530" height="346" rx="10" fill="#252321"/>
+      <rect x="0" y="0" width="530" height="346" rx="10" fill="#ffffff" stroke="#252321" stroke-width="2"/>
+      
+      <rect x="0" y="0" width="530" height="36" rx="10" fill="#f5f0e8"/>
+      <rect x="0" y="24" width="530" height="12" fill="#f5f0e8"/>
+      <line x1="0" y1="36" x2="530" y2="36" stroke="#252321" stroke-width="1.8"/>
+      <text x="16" y="23" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="800">REORGANIZATION PROPOSAL QUEUE</text>
+      <text x="400" y="23" fill="#5c5752" font-family="'Space Mono', monospace" font-size="10.5">3 ITEMS PENDING</text>
+
+      <g transform="translate(16, 50)">
+        <rect x="2" y="2" width="498" height="66" rx="6" fill="#252321"/>
+        <rect x="0" y="0" width="498" height="66" rx="6" fill="#fffaf2" stroke="#252321" stroke-width="1.5"/>
+        <rect x="12" y="16" width="16" height="16" rx="3" fill="#f25c2a" stroke="#252321" stroke-width="1.5"/>
+        <path d="M15 24 L18 27 L25 19" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="36" y="25" fill="#252321" font-family="'Space Mono', monospace" font-size="11.5" font-weight="700">meeting-notes.md</text>
+        <text x="36" y="42" fill="#5c5752" font-family="'Space Mono', monospace" font-size="10.5">Destination: actionable/meeting-notes.md</text>
+        <text x="36" y="56" fill="#f25c2a" font-family="-apple-system, sans-serif" font-size="10" font-weight="600">Action items identified: 3 tasks, 1 deadline</text>
+        <rect x="410" y="14" width="76" height="20" rx="4" fill="#f5f0e8" stroke="#252321" stroke-width="1"/>
+        <text x="448" y="27" fill="#252321" font-family="'Space Mono', monospace" font-size="9" font-weight="700" text-anchor="middle">DOC / MOVE</text>
+      </g>
+
+      <g transform="translate(16, 126)">
+        <rect x="2" y="2" width="498" height="66" rx="6" fill="#252321"/>
+        <rect x="0" y="0" width="498" height="66" rx="6" fill="#fffaf2" stroke="#252321" stroke-width="1.5"/>
+        <rect x="12" y="16" width="16" height="16" rx="3" fill="#f25c2a" stroke="#252321" stroke-width="1.5"/>
+        <path d="M15 24 L18 27 L25 19" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="36" y="25" fill="#252321" font-family="'Space Mono', monospace" font-size="11.5" font-weight="700">sales.csv</text>
+        <text x="36" y="42" fill="#5c5752" font-family="'Space Mono', monospace" font-size="10.5">Destination: dataset/sales.csv</text>
+        <text x="36" y="56" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10">CSV Profiled: 25 rows, 5 columns, 0 nulls</text>
+        <rect x="410" y="14" width="76" height="20" rx="4" fill="#f5f0e8" stroke="#252321" stroke-width="1"/>
+        <text x="448" y="27" fill="#252321" font-family="'Space Mono', monospace" font-size="9" font-weight="700" text-anchor="middle">TABULAR</text>
+      </g>
+
+      <g transform="translate(16, 202)">
+        <rect x="2" y="2" width="498" height="66" rx="6" fill="#252321"/>
+        <rect x="0" y="0" width="498" height="66" rx="6" fill="#f5f0e8" stroke="#252321" stroke-width="1.5"/>
+        <rect x="12" y="16" width="16" height="16" rx="3" fill="#ffffff" stroke="#252321" stroke-width="1.5"/>
+        <text x="36" y="25" fill="#252321" font-family="'Space Mono', monospace" font-size="11.5" font-weight="700">duplicate-notes.txt</text>
+        <text x="36" y="42" fill="#f25c2a" font-family="'Space Mono', monospace" font-size="10.5">SHA-256 duplicate of meeting-notes.md</text>
+        <text x="36" y="56" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10">Proposal defaults to keep-in-place for safety</text>
+        <rect x="390" y="14" width="96" height="20" rx="4" fill="#252321"/>
+        <text x="438" y="27" fill="#ffffff" font-family="'Space Mono', monospace" font-size="9" font-weight="700" text-anchor="middle">KEEP IN PLACE</text>
+      </g>
+
+      <g transform="translate(16, 282)">
+        <text x="0" y="18" fill="#5c5752" font-family="'Space Mono', monospace" font-size="10.5">Checked items will be relocated upon explicit approval.</text>
+        <text x="0" y="34" fill="#5c5752" font-family="'Space Mono', monospace" font-size="10.5">Server verifies pre-move hash; rollback journal is created automatically.</text>
+      </g>
+    </g>
+
+    <g transform="translate(554, 0)">
+      <rect x="3" y="3" width="358" height="346" rx="10" fill="#252321"/>
+      <rect x="0" y="0" width="358" height="346" rx="10" fill="#ffffff" stroke="#252321" stroke-width="2"/>
+      
+      <rect x="0" y="0" width="358" height="36" rx="10" fill="#f5f0e8"/>
+      <rect x="0" y="24" width="358" height="12" fill="#f5f0e8"/>
+      <line x1="0" y1="36" x2="358" y2="36" stroke="#252321" stroke-width="1.8"/>
+      <text x="16" y="23" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="800">APPROVAL CONTROL CENTER</text>
+
+      <g transform="translate(16, 50)">
+        <text x="0" y="16" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="13" font-weight="800">Extracted Action Items</text>
+        
+        <g transform="translate(0, 30)">
+          <rect x="0" y="0" width="12" height="12" rx="2" fill="#f25c2a"/>
+          <path d="M2 6 L5 9 L10 3" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+          <text x="20" y="10" fill="#252321" font-family="-apple-system, sans-serif" font-size="11" font-weight="600">Finalize Q3 revenue report</text>
+        </g>
+        
+        <g transform="translate(0, 52)">
+          <rect x="0" y="0" width="12" height="12" rx="2" fill="#f25c2a"/>
+          <path d="M2 6 L5 9 L10 3" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+          <text x="20" y="10" fill="#252321" font-family="-apple-system, sans-serif" font-size="11" font-weight="600">Confirm server-authoritative approval</text>
+        </g>
+
+        <g transform="translate(0, 74)">
+          <rect x="0" y="0" width="12" height="12" rx="2" fill="#f25c2a"/>
+          <path d="M2 6 L5 9 L10 3" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+          <text x="20" y="10" fill="#252321" font-family="-apple-system, sans-serif" font-size="11" font-weight="600">Verify Render deployment blueprint</text>
+        </g>
+      </g>
+
+      <g transform="translate(16, 170)">
+        <rect x="0" y="0" width="326" height="1" fill="#ded7cc"/>
+        
+        <g transform="translate(0, 20)">
+          <rect x="4" y="4" width="326" height="44" rx="6" fill="#252321"/>
+          <rect x="0" y="0" width="326" height="44" rx="6" fill="#f25c2a" stroke="#252321" stroke-width="2"/>
+          <text x="163" y="27" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-size="13" font-weight="800" text-anchor="middle">APPROVE SELECTED (2)</text>
+        </g>
+
+        <g transform="translate(0, 80)">
+          <rect x="4" y="4" width="326" height="44" rx="6" fill="#252321"/>
+          <rect x="0" y="0" width="326" height="44" rx="6" fill="#f5f0e8" stroke="#252321" stroke-width="2"/>
+          <text x="163" y="27" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="13" font-weight="800" text-anchor="middle">ROLLBACK OPERATIONS</text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

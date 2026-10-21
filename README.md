@@ -1,173 +1,215 @@
-# SlothDesk AI
-### Let your AI handle the busywork.
+<div align="center">
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-f25c2a.svg)](./LICENSE)
-[![Node: >=20](https://img.shields.io/badge/Node-%3E%3D20-252321.svg)](https://nodejs.org/)
-[![TypeScript: 5.7](https://img.shields.io/badge/TypeScript-5.7-3178c6.svg)](https://www.typescriptlang.org/)
-[![Tests: 24 passing](https://img.shields.io/badge/Tests-24%20passing-success.svg)](./src/tests/)
-[![Architecture: Local--First](https://img.shields.io/badge/Architecture-Local--First-f5f0e8.svg?labelColor=252321)](#privacy-and-security-model)
+<a href="#overview">
+  <img src="assets/slothdesk-logo.svg" alt="SlothDesk AI Brand Lockup" width="460" />
+</a>
 
-SlothDesk AI is a local-first productivity automation workbench. It scans a folder you explicitly designate, inventories documents and tabular files, flags exact cryptographic duplicates, extracts actionable tasks and decisions, profiles CSV data without cloud dependencies, and prepares category organization proposals. Nothing moves on your filesystem until you inspect and approve individual operations in the Review Center.
+<p align="center">
+  <strong>Let your AI handle the busywork.</strong><br />
+  <em>A local-first, privacy-grade desktop automation workbench powered by open-weight AI.</em>
+</p>
+
+<p align="center">
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-f25c2a.svg?style=flat-square" alt="License: MIT" /></a>
+  <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-%3E%3D20%20LTS-252321.svg?style=flat-square" alt="Node.js: >=20 LTS" /></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.7-252321.svg?style=flat-square" alt="TypeScript: 5.7" /></a>
+  <a href="./src/tests/"><img src="https://img.shields.io/badge/Tests-24%20Passing-success.svg?style=flat-square" alt="Tests: 24 Passing" /></a>
+  <a href="https://ollama.com"><img src="https://img.shields.io/badge/Model-Gemma%203%3A4b-f25c2a.svg?style=flat-square" alt="Model: Gemma 3:4b" /></a>
+  <a href="#security-model"><img src="https://img.shields.io/badge/Architecture-Local--First-252321.svg?style=flat-square" alt="Architecture: Local-First" /></a>
+</p>
+
+<p align="center">
+  <a href="#core-features"><strong>Explore Features</strong></a> •
+  <a href="#installation-and-quick-start"><strong>Quick Start</strong></a> •
+  <a href="#five-minute-reproducible-demo"><strong>Live Demo</strong></a> •
+  <a href="#architecture"><strong>Architecture</strong></a> •
+  <a href="#security-model"><strong>Security Model</strong></a> •
+  <a href="#contribution-guide"><strong>Contributing</strong></a>
+</p>
+
+<br />
+
+<a href="#architecture">
+  <img src="assets/slothdesk-hero.svg" alt="SlothDesk AI Pipeline Architecture" width="100%" />
+</a>
+
+</div>
 
 ---
 
 ## Table of Contents
 
 - [Overview](#overview)
+- [Design Philosophy](#design-philosophy)
 - [Core Features](#core-features)
-- [Five-Minute Reproducible Demo](#five-minute-reproducible-demo)
+- [Application Preview](#application-preview)
+- [How the Application Works](#how-the-application-works)
 - [Architecture](#architecture)
 - [Verified Technology Stack](#verified-technology-stack)
 - [Prerequisites](#prerequisites)
 - [Installation and Quick Start](#installation-and-quick-start)
 - [Ollama and Gemma Setup](#ollama-and-gemma-setup)
-- [End-to-End Usage Instructions](#end-to-end-usage-instructions)
-- [Privacy and Security Model](#privacy-and-security-model)
-- [Local Mode vs. Hosted Mode](#local-mode-vs-hosted-mode)
-- [Tests and Development Workflow](#tests-and-development-workflow)
-- [Render Deployment Instructions](#render-deployment-instructions)
-- [Honest Roadmap and Limitations](#honest-roadmap-and-limitations)
-- [Contribution Guidelines](#contribution-guidelines)
+- [Five-Minute Reproducible Demo](#five-minute-reproducible-demo)
+- [Security Model](#security-model)
+- [Local Execution versus Hosted Deployment](#local-execution-versus-hosted-deployment)
+- [Tests and Development](#tests-and-development)
+- [Render Deployment](#render-deployment)
+- [Roadmap and Limitations](#roadmap-and-limitations)
+- [Contribution Guide](#contribution-guide)
 - [License and Acknowledgments](#license-and-acknowledgments)
 
 ---
 
 ## Overview
 
-Modern knowledge workers frequently deal with disorganized folders filled with meeting notes, project briefs, exported datasets, and duplicate files. Traditional automation scripts lack context, while commercial cloud AI platforms require uploading private desktop files to external servers.
+Modern knowledge workers and engineers regularly contend with cluttered project folders full of exported meeting notes, unstructured documents, untyped CSV tables, and duplicate files. Conventional shell scripts lack semantic awareness, while hosted cloud AI utilities demand transmitting private desktop documents across external servers.
 
-SlothDesk AI was engineered to bridge this gap with a **calm, inspectable, local-first model**:
+**SlothDesk AI** solves this with a **calm, inspectable, local-first automation workbench**:
 
-1. **Explicit authorization:** The application only accesses the exact directory path you enter.
-2. **Deterministic safety:** Cryptographic deduplication, schema validation, path traversal defense, and tabular profiling operate natively on your machine with zero cloud dependence.
-3. **Optional open-weight intelligence:** When Ollama is running locally, Gemma summarizes text and extracts tasks on-device. When unavailable, deterministic fallback takes over automatically.
-4. **Human-in-the-loop review:** Model predictions produce proposals, never automatic file changes. You approve exactly what moves, and every completed operation is journaled and reversible.
+1. **Zero Unsolicited File Operations:** The server inspects only the explicit directory path you specify. No background daemon traverses personal directories or cloud drives.
+2. **Deterministic Cryptographic Grounding:** Exact duplicate detection via streaming SHA-256 hashes, path traversal defense, and tabular profiling operate purely on your machine with zero cloud dependence.
+3. **Open-Weight Intelligence On-Device:** When [Ollama](https://ollama.com) is running locally, Gemma summarizes text and extracts structured action items on your machine. When offline, an automated deterministic fallback takes over instantly.
+4. **Human-in-the-Loop Review:** Model outputs produce proposals, never direct filesystem alterations. You inspect, select, and authorize every move in the Review Center, with atomic journals and one-click rollback.
+
+---
+
+## Design Philosophy
+
+SlothDesk AI couples retro-futuristic developer tooling aesthetics with defensive software engineering:
+
+- **Warm Cream & Charcoal Palette:** High-contrast editorial presentation (`#f5f0e8` cream, `#252321` ink) with vivid orange action accents (`#f25c2a`).
+- **Tactile Neo-Brutalist Affordances:** Strong 2px borders, visible 4px hard-offset shadows, and physical button-press responses engineered for high confidence during file operations.
+- **Zero Framework Bloat:** Fast, lightweight frontend running vanilla HTML5, CSS3 tokens, and modern ES modules with zero bundle lag.
+- **Transparent Failure Modes:** Clear model status indicators (`READY` vs `FALLBACK`) with deterministic reliability when GPU inference is unavailable.
 
 ---
 
 ## Core Features
 
-| Feature | Implementation | Benefit |
-|---|---|---|
-| **Cryptographic Deduplication** | Streaming SHA-256 hash calculation across all scanned files. | Immediately detects identical files even if filenames or extensions differ, preventing redundant storage. |
-| **Deterministic CSV Profiling** | Pure TypeScript parser calculating row counts, columns, null rates, and inferred data types. | Delivers immediate tabular diagnostics without passing data to an LLM or external API. |
-| **Open-Weight Text Analysis** | Local Ollama adapter calling `gemma3:4b` with schema-constrained JSON extraction. | Summarizes notes and extracts tasks and deadlines on your own machine. |
-| **Resilient Deterministic Fallback** | Regular expression and structural heuristics extracting action items and dates. | Guarantees full workbench utility even when Ollama is offline or on machines without GPU acceleration. |
-| **Collision-Safe Proposals** | Filename disambiguation (`name-1.ext`, `name-2.ext`) and parent segment tracking. | Prevents partial move failures and file clobbering when identical file names exist in distinct folders. |
-| **Server-Authoritative Approval** | UUID-keyed execution records loaded strictly from the local server store. | Prevents client parameter forgery, path injection, or replay of completed operations. |
-| **Tamper-Resistant Rollback** | Pre-move SHA-256 hash tracking and destination existence verification via `lstat`. | Restores original directory layouts while refusing to overwrite newly created or modified files. |
-| **Crash-Resilient Persistence** | Atomic temporary-file creation and POSIX rename writes for `.data/` records. | Protects history records and operation journals against process interrupts or power losses. |
+<div align="center">
+
+| Icon | Capability | Technical Implementation | Practical Benefit |
+| :---: | :--- | :--- | :--- |
+| <img src="assets/icons/local-first.svg" width="38" height="38" alt="Local-First Icon" /> | **Local-First Processing** | Natively bound Node.js HTTP server reading only user-designated paths via `safeWorkspacePath`. | Absolute privacy. Zero documents, credentials, or filesystem paths ever leave your local machine. |
+| <img src="assets/icons/open-weight.svg" width="38" height="38" alt="Open-Weight Icon" /> | **Open-Weight AI** | Local Ollama adapter querying `gemma3:4b` with schema-enforced structured JSON output. | High-quality task and decision extraction without third-party API bills, tracking, or rate limits. |
+| <img src="assets/icons/hash-dedup.svg" width="38" height="38" alt="Hash Dedup Icon" /> | **SHA-256 Duplicate Detection** | Streaming cryptographic hashing over all scanned files up to configurable byte boundaries. | Identifies identical files regardless of file name or location; preserves duplicates safely in place. |
+| <img src="assets/icons/task-extract.svg" width="38" height="38" alt="Task Extract Icon" /> | **Action Item Extraction** | Joint parser extracting `TODO:` items, deadlines, dates, and organizational categories. | Transforms unstructured meeting dumps and project briefs into structured, actionable checklists. |
+| <img src="assets/icons/csv-profile.svg" width="38" height="38" alt="CSV Profile Icon" /> | **Deterministic CSV Profiling** | Pure TypeScript parser calculating row counts, columns, null rates, and inferred data types. | Delivers immediate tabular diagnostics without passing data to an LLM or external API. |
+| <img src="assets/icons/approval-gate.svg" width="38" height="38" alt="Approval Gate Icon" /> | **Approval-Gated Execution** | Server-authoritative UUID execution store verifying proposal IDs before executing filesystem operations. | Eliminates rogue file renames and client parameter forgery; you retain total command over moves. |
+| <img src="assets/icons/safe-rollback.svg" width="38" height="38" alt="Safe Rollback Icon" /> | **Tamper-Resistant Rollback** | Pre-move SHA-256 verification and destination existence checks before reversing file relocations. | Safely restores original file layouts while refusing to overwrite newly created or modified files. |
+| <img src="assets/icons/privacy-boundary.svg" width="38" height="38" alt="Privacy Boundary Icon" /> | **Defensive Workspace Bounds** | Canonical `fs.realpath` resolution blocking `../`, absolute escapes, symlink escapes, and null bytes. | Hardens local execution against accidental or malicious traversal outside the designated folder. |
+
+</div>
 
 ---
 
-## Five-Minute Reproducible Demo
+## Application Preview
 
-The repository includes a synthetic test directory at `demo-workspace/` containing realistic notes, meeting decisions, a duplicate file, and a sample sales dataset.
+Below is an architectural vector schematic of the SlothDesk AI workbench interface:
 
-### 1. Copy the Demo Files
+<div align="center">
+  <img src="assets/slothdesk-preview.svg" alt="SlothDesk AI Abstract Application Interface Schematic" width="100%" />
+  <p><em>Abstract UI Schematic: The 4-tab workbench showcasing scanned inventory metrics, cryptographic deduplication, on-device signal extraction, and the human-in-the-loop review queue.</em></p>
+</div>
 
-Create a temporary working copy to keep the repository files clean:
+---
 
-```bash
-cp -r demo-workspace /tmp/slothdesk-demo
+## How the Application Works
+
+```
+┌─────────────────┐      ┌─────────────────────────┐      ┌─────────────────────────┐
+│  1. Ingestion   │ ───► │  2. Cryptographic Hash  │ ───► │   3. Local Extraction   │
+│ User designates │      │ Streaming SHA-256 check │      │ Gemma 3:4b (or fallback)│
+│ specific folder │      │ flags exact duplicates  │      │ profiles tasks & CSVs   │
+└─────────────────┘      └─────────────────────────┘      └─────────────────────────┘
+                                                                       │
+                                                                       ▼
+┌─────────────────┐      ┌─────────────────────────┐      ┌─────────────────────────┐
+│ 6. Safe Journal │ ◄─── │  5. Atomic Relocation   │ ◄─── │  4. Review & Approval   │
+│ Atomic POSIX log│      │ Collision-safe moves to │      │ Server-authoritative    │
+│ enables rollback│      │ categorized subfolders  │      │ approval gate in web UI │
+└─────────────────┘      └─────────────────────────┘      └─────────────────────────┘
 ```
 
-### 2. Launch the Application
-
-```bash
-npm run build
-npm start
-```
-
-Open `http://localhost:3147` in your browser.
-
-### 3. Run the Dry-Run Scan
-
-1. Select the **Workspace** tab.
-2. Enter `/tmp/slothdesk-demo` into the **Authorized folder path** input.
-3. Click **Run dry-run scan**.
-4. The dashboard displays:
-   - **4 files inventoried.**
-   - **1 duplicate flagged:** `meeting-notes.md` is identified as an exact SHA-256 duplicate of `duplicate-notes.txt`.
-   - **3 actionable tasks and decisions extracted.**
-   - **Net time savings calculated** from actual workflow run duration.
-
-### 4. Inspect CSV Profiling
-
-Switch to the **CSV Lab** tab to examine row counts, duplicate rows, missing fields, and column types for `sales.csv`.
-
-### 5. Review and Approve Proposals
-
-1. Switch to the **Review Center** tab.
-2. Review the generated reorganization proposals (`actionable/duplicate-notes.txt`, `actionable/project-notes.txt`, `dataset/sales.csv`).
-3. Click **Approve selected operations**.
-4. Check your terminal or file manager: the files in `/tmp/slothdesk-demo` are relocated cleanly to their categorized folders.
-
-### 6. Execute Safe Rollback
-
-1. In the **Review Center**, click **Rollback completed operations**.
-2. Check `/tmp/slothdesk-demo`: every moved file is returned to its original path.
-3. View the **Activity & Settings** tab to confirm the recorded execution and rollback timestamp.
+1. **Explicit Designation:** The user inputs a specific folder path (`/path/to/folder`). Path traversal sequences (`../`, null bytes, symlink targets outside root) are resolved and blocked.
+2. **Cryptographic Deduplication:** The core scanner computes streaming SHA-256 hashes across files. Exact matches are flagged with keep-in-place proposals so redundant files are not lost.
+3. **Dual-Track Signal Extraction:**
+   - **Tabular Data:** CSV files route to the deterministic CSV profiler for row counts, columns, null percentages, and column typing.
+   - **Text & Notes:** Text and Markdown documents route to the model provider. If Ollama is active, `gemma3:4b` performs schema-constrained extraction; if offline, deterministic heuristics extract action items and dates.
+4. **Collision-Safe Proposals:** Proposed destinations are sanitized. If multiple files collide on a destination name, numeric disambiguation (`name-1.ext`, `name-2.ext`) prevents clobbering.
+5. **Human Inspection & Approval:** Proposals are stored under a server-authoritative UUID. The user visits the **Review Center**, verifies the operations, and clicks **Approve selected operations**.
+6. **Reversible Execution:** Approved files are relocated atomically via `fs.rename`. The pre-move hash, timestamp, and paths are committed to `.data/` using atomic temporary writes and POSIX renames.
 
 ---
 
 ## Architecture
 
-The diagram below reflects the actual request flow and safety boundaries enforced in the codebase:
+The following diagram details the actual request lifecycle, component interactions, and security boundaries implemented in the codebase:
 
 ```mermaid
 flowchart TD
-    User([User]) --> WebUI[Web Interface: HTML / CSS / Vanilla JS]
-    WebUI -->|HTTP JSON Requests| API[Application API Server: src/server.ts]
+    User([User / Developer]) -->|Enters Folder Path| WebUI[Web Interface: HTML5 / CSS3 / Vanilla JS]
+    WebUI -->|POST /api/cleanup| API[Node.js HTTP Server: src/server.ts]
     
-    API -->|Validate Directory| Boundary[safeWorkspacePath & realpath Boundary Check]
+    API -->|Validate Directory| Boundary[Boundary Guard: safeWorkspacePath & fs.realpath]
     Boundary --> Workflow[Workflow Engine: src/workflow.ts]
     Workflow --> Scanner[Workspace Scanner: src/core.ts]
     
-    Scanner -->|SHA-256 Streaming Hash| HashCheck{Duplicate Found?}
-    HashCheck -->|Yes| DupFlag[Flag Duplicate Proposal: Keep in Place]
-    HashCheck -->|No| TypeRoute{File Type}
+    Scanner -->|Streaming SHA-256| HashCheck{Duplicate Hash?}
+    HashCheck -->|Duplicate Detected| DupFlag[Flag Duplicate Proposal: Keep in Place]
+    HashCheck -->|Unique Content| TypeRoute{File Extension}
     
     TypeRoute -->|CSV Tabular| Profiler[Deterministic CSV Profiler: csvProfile]
-    TypeRoute -->|Text / Markdown| Provider[Model Provider Adapter: src/provider.ts]
+    TypeRoute -->|TXT / MD / JSON| Provider[Model Provider Adapter: src/provider.ts]
     
-    Provider -->|Ollama Running| Ollama[Local Ollama / Gemma 3:4b API]
-    Provider -->|Ollama Unavailable| Fallback[Deterministic Signal Extractor]
+    Provider -->|Ollama Running| Ollama[Local Ollama / Gemma 3:4b Structured API]
+    Provider -->|Ollama Offline| Fallback[Deterministic Regex Fallback Engine]
     
     Profiler --> Disambiguate[Collision Disambiguation Engine]
     Ollama --> Disambiguate
     Fallback --> Disambiguate
     DupFlag --> Disambiguate
     
-    Disambiguate --> PendingExec[(Stored Pending Execution: src/store.ts)]
+    Disambiguate --> PendingExec[(Server Store: Pending Executions)]
     PendingExec --> ReviewQueue[Review Center Queue]
     
     User -->|Explicit Selection| ReviewQueue
     ReviewQueue -->|POST /api/approve| ApprovalGate[Server-Authoritative Approval Gate]
     
-    ApprovalGate --> SymlinkGuard[Symlink Escape & lstat Existence Checks]
-    SymlinkGuard --> MoveFile[Atomic Filesystem Move]
+    ApprovalGate --> SymlinkGuard[Symlink Escape & lstat Checks]
+    SymlinkGuard --> MoveFile[Atomic Filesystem Move: fs.rename]
     MoveFile --> JournalStore[(Atomic Operations Journal: fileHash & Timestamp)]
     
     User -->|POST /api/rollback| RollbackEngine[Rollback Engine: src/workflow.ts]
     RollbackEngine --> HashVerify{Destination Hash Matches Original?}
-    HashVerify -->|Yes & Source Free| RevertMove[Revert Move to Original Path]
+    HashVerify -->|Matches & Source Free| RevertMove[Revert Move to Original Path]
     HashVerify -->|Modified or Occupied| AbortRollback[Abort Rollback: Prevent Data Loss]
 ```
+
+### Static Architecture Diagram
+
+A matching vector representation of the multi-tier architecture is maintained in the repository:
+
+<div align="center">
+  <img src="assets/slothdesk-architecture.svg" alt="SlothDesk AI Static Architecture Diagram" width="100%" />
+</div>
+
+> **Important Deployment Notice:** When deployed to hosted cloud environments (e.g., Render), SlothDesk AI runs with `HOSTED_MODE=true`. In hosted mode, all filesystem scanning and move endpoints are blocked (HTTP 403) to prevent cloud host exploitation. Hosted Render instances cannot access, scan, or modify files on your local computer.
 
 ---
 
 ## Verified Technology Stack
 
-| Component | Technology | Rationale |
-|---|---|---|
-| **Runtime** | Node.js (>=20 LTS) | Native `fetch`, `crypto`, `fs/promises`, and built-in test runner. |
-| **Language** | TypeScript 5.7 | Strict type safety, modern ES modules, and zero runtime overhead. |
-| **Testing** | Node.js Test Runner (`node --test`) | Zero-dependency native test harness with sub-millisecond execution. |
-| **Styling** | Vanilla CSS3 | Custom brand tokens (`--cream`, `--ink`, `--orange`), zero build dependencies. |
-| **Frontend** | Vanilla JavaScript (ES2022) | Single-file responsive interface with zero framework bloat. |
-| **Inference** | Ollama HTTP API (Local) | Standard interface for open-weight models (`gemma3:4b`). |
-| **Persistence** | Atomic JSON File Store | Self-contained, portable, zero-setup storage without external database services. |
+| Layer | Technology | Version | Architectural Role |
+| :--- | :--- | :--- | :--- |
+| **Runtime** | Node.js | >=20 LTS (Tested on 20 & 24) | Native `fetch`, `node:crypto`, `node:fs/promises`, native test runner. |
+| **Language** | TypeScript | 5.7+ | Strict type checking, zero runtime overhead, ES module emission. |
+| **Testing** | Node.js Test Runner | Native (`node --test`) | Sub-second execution, zero external testing dependencies. |
+| **Styling** | Vanilla CSS3 | Standard | Custom neo-brutalist tokens (`--cream`, `--ink`, `--orange`), responsive grid. |
+| **Frontend** | Vanilla JavaScript | ES2022 | Single-file reactive interface without framework overhead. |
+| **Inference** | Ollama | HTTP API | Open-weight on-device language models (`gemma3:4b`). |
+| **Fallback** | Heuristic Engine | TypeScript Native | Deterministic task extraction and date parsing when Ollama is offline. |
+| **Storage** | Atomic JSON Store | POSIX File API | Crash-resilient state records in `.data/` using temp-write & atomic rename. |
 
 ---
 
@@ -176,7 +218,7 @@ flowchart TD
 - **Node.js:** Version 20.0.0 or higher.
 - **npm:** Version 10.0.0 or higher.
 - **Operating System:** macOS, Linux, or Windows (WSL recommended for Windows).
-- **Optional for AI inference:** [Ollama](https://ollama.com) installed locally with `gemma3:4b` pulled.
+- **Optional for Local AI Inference:** [Ollama](https://ollama.com) installed with `gemma3:4b` pulled.
 
 ---
 
@@ -185,36 +227,40 @@ flowchart TD
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/shauryatiwari/SlothDesk-Ai.git
+git clone https://github.com/dr5t/SlothDesk-Ai.git
 cd SlothDesk-Ai
 ```
 
 ### 2. Install Dependencies
 
 ```bash
-npm install
+npm ci
 ```
 
-### 3. Run Tests and Build
+### 3. Verify the Test Suite
+
+Run the full automated test suite to confirm platform integrity:
 
 ```bash
 npm test
-npm run build
 ```
 
-### 4. Start the Local Server
+### 4. Build and Launch
+
+Compile TypeScript and start the local HTTP server:
 
 ```bash
+npm run build
 npm start
 ```
 
-Navigate to `http://localhost:3147` in your web browser.
+Open `http://localhost:3147` in your browser.
 
 ---
 
 ## Ollama and Gemma Setup
 
-SlothDesk AI is preconfigured to use the open-weight **Gemma 3 (4B)** model via Ollama.
+SlothDesk AI is preconfigured to utilize Google's open-weight **Gemma 3 (4B)** model via Ollama.
 
 ### 1. Install Ollama
 
@@ -234,51 +280,89 @@ ollama serve
 
 ### 4. Verify Local Connection
 
-Check the status badge in the SlothDesk AI navigation bar:
-- If Ollama is active with the model present: **`READY · Local model is ready.`**
-- If Ollama is stopped or unavailable: **`FALLBACK · Ollama is unavailable; deterministic local analysis is active.`**
+Check the status pill in the SlothDesk AI top navigation bar:
+- If Ollama is active with the model present: **`READY · Local model is ready (Ollama / Gemma 3:4b)`**
+- If Ollama is offline or unavailable: **`FALLBACK · Ollama is unavailable; deterministic local analysis is active.`**
 
-The application functions completely under fallback mode without throwing runtime errors or blocking document processing.
-
----
-
-## End-to-End Usage Instructions
-
-### 1. Authorizing a Workspace
-
-SlothDesk AI will never scan your whole drive or default directories. In the **Workspace** tab, provide an absolute or relative path to the specific directory you wish to organize.
-
-### 2. Inspecting the Inventory
-
-Click **Run dry-run scan**. The engine will:
-- Parse all supported files up to `MAX_FILE_BYTES` (default 1 MB).
-- Group exact cryptographic duplicates.
-- Extract task checklists (`TODO:`, `Task:`) and decisions.
-- Profile any CSV tables.
-- Compute estimated net time saved (`manual estimate - processing duration - review estimate`).
-
-### 3. Selecting and Approving Proposals
-
-Switch to the **Review Center**:
-- Proposals are presented as unchecked or checked review items.
-- Duplicate files default to keep-in-place review proposals so no data is discarded.
-- Select the proposals you agree with and click **Approve selected operations**.
-- The server performs atomic moves with collision avoidance.
-
-### 4. Reversing Moves
-
-If you wish to restore the workspace to its prior arrangement:
-- Click **Rollback completed operations** in the Review Center.
-- The server verifies each file's integrity and returns it to its original path.
+> **Reliability Guarantee:** The workbench operates seamlessly under fallback mode. You do not need GPU hardware or an active internet connection to organize folders, detect duplicates, or profile CSV data.
 
 ---
 
-## Privacy and Security Model
+## Five-Minute Reproducible Demo
 
-SlothDesk AI was built around strict defensive engineering principles:
+The repository contains a synthetic test directory at `demo-workspace/` containing realistic notes, meeting decisions, an exact duplicate file, and a sample sales dataset.
 
-1. **Workspace Boundary Confinement:** All file access uses `safeWorkspacePath` and `fs.realpath` resolution. Path traversal sequences (`../`, absolute path escapes, null bytes) are blocked immediately.
-2. **Server-Authoritative Operations:** Client browsers receive execution IDs and proposal IDs. The server validates every approval against its own persisted records. Client-injected paths or tampered IDs are rejected.
+### 1. Copy the Demo Workspace
+
+Create a temporary working copy outside the git working tree:
+
+```bash
+cp -r demo-workspace /tmp/slothdesk-demo
+```
+
+### 2. Launch the Application
+
+```bash
+npm run build
+npm start
+```
+
+Navigate to `http://localhost:3147` in your browser.
+
+### 3. Run the Dry-Run Scan
+
+1. Select the **Workspace** tab.
+2. Enter `/tmp/slothdesk-demo` into the **Authorized folder path** input.
+3. Click **Run dry-run scan**.
+4. The dashboard displays:
+   - **4 files inventoried** (`meeting-notes.md`, `duplicate-notes.txt`, `project-notes.txt`, `sales.csv`).
+   - **1 duplicate flagged:** `duplicate-notes.txt` matches `meeting-notes.md` byte-for-byte.
+   - **3 actionable tasks & decisions extracted** from the documents.
+   - **Net time savings calculated** based on processing duration vs manual estimate.
+
+### 4. Inspect CSV Profiling
+
+Switch to the **CSV Lab** tab to inspect row counts, duplicate rows, missing fields, and column types for `sales.csv`.
+
+### 5. Review and Approve Proposals
+
+1. Switch to the **Review Center** tab.
+2. Review the generated reorganization proposals (`actionable/duplicate-notes.txt`, `actionable/project-notes.txt`, `dataset/sales.csv`).
+3. Notice that `duplicate-notes.txt` defaults to **Keep in Place** to prevent accidental file deletion.
+4. Click **Approve selected operations**.
+5. Check `/tmp/slothdesk-demo` in your terminal or file manager: the files have been relocated into their categorized folders.
+
+### 6. Execute Safe Rollback
+
+1. In the **Review Center**, click **Rollback completed operations**.
+2. Check `/tmp/slothdesk-demo`: every moved file has been restored to its original path.
+3. Open the **Activity & Settings** tab to confirm the recorded execution and rollback timestamp.
+
+---
+
+## Security Model
+
+SlothDesk AI is built around defensive systems engineering:
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        DEFENSIVE SECURITY MATRIX                       │
+├───────────────────────────────┬────────────────────────────────────────┤
+│ THREAT VECTOR                 │ DEFENSIVE COUNTERMEASURE               │
+├───────────────────────────────┼────────────────────────────────────────┤
+│ Path Traversal (../, nulls)   │ safeWorkspacePath & fs.realpath check  │
+│ Symlink Directory Escapes     │ lstat verification & boundary check    │
+│ Client Proposal Forgery       │ Server-authoritative UUID execution DB │
+│ Destination Overwrite Clobber │ Suffix disambiguation (name-1.ext)     │
+│ Rollback Overwrite Attack     │ Pre-move SHA-256 hash comparison       │
+│ Crashed Process Corruption    │ Atomic temp-write + POSIX rename write │
+│ Hosted Host Exploitation      │ Strict HOSTED_MODE=true 403 firewall   │
+│ Static File Traversal         │ Strict /public boundary confinement    │
+└───────────────────────────────┴────────────────────────────────────────┘
+```
+
+1. **Workspace Boundary Confinement:** All file access uses `safeWorkspacePath` and `fs.realpath` resolution. Path traversal sequences (`../`, absolute paths, null bytes) are blocked immediately.
+2. **Server-Authoritative Approvals:** Client browsers receive execution IDs and proposal IDs. The server validates every approval against its own persisted records. Client-injected paths or tampered IDs are rejected.
 3. **Symlink Escape Defense:** Symlinks pointing outside the authorized workspace are rejected during scans and operation approvals.
 4. **Collision Disambiguation:** Proposals disambiguate duplicate file names (`notes-1.txt`, `notes-2.txt`) across folders before execution, preventing accidental overwrites.
 5. **Rollback Integrity Verification:** Rollback compares the file's current SHA-256 hash against the hash recorded at move time. If a user edited the file in its new location, or if a new file occupies the original path, rollback aborts to prevent data loss.
@@ -287,49 +371,53 @@ SlothDesk AI was built around strict defensive engineering principles:
 
 ---
 
-## Local Mode vs. Hosted Mode
+## Local Execution versus Hosted Deployment
 
-| Aspect | Local Mode (`HOSTED_MODE=false`) | Hosted Mode (`HOSTED_MODE=true`) |
-|---|---|---|
-| **Primary Use Case** | Personal desktop and local developer workbench. | Cloud-deployed demonstration environments (e.g. Render). |
-| **Workspace Scanning** | Allowed only for explicitly entered local folders. | **Strictly blocked (HTTP 403).** |
-| **Operation Approvals** | Allowed for authorized local executions. | **Strictly blocked (HTTP 403).** |
-| **Rollback** | Allowed for local executions. | **Strictly blocked (HTTP 403).** |
+| Characteristic | Local Execution (`HOSTED_MODE=false`) | Hosted Deployment (`HOSTED_MODE=true`) |
+| :--- | :--- | :--- |
+| **Target Environment** | Developer workstation, local desktop. | Public cloud demo (e.g. Render, Railway). |
+| **Filesystem Scanning** | Allowed for explicitly designated local folders. | **Strictly blocked (HTTP 403 Forbidden).** |
+| **Operation Approval** | Allowed for authorized local executions. | **Strictly blocked (HTTP 403 Forbidden).** |
+| **Rollback Execution** | Allowed for recorded local executions. | **Strictly blocked (HTTP 403 Forbidden).** |
+| **Inference Connection** | Connects to local Ollama on `127.0.0.1:11434`. | Reverts gracefully to deterministic fallback. |
 | **Static UI & Health** | Enabled (`/`, `/api/health`, `/api/executions`). | Enabled (`/`, `/api/health`, `/api/executions`). |
-| **Security Guarantee** | Server operations confined to user workspace. | Server filesystem cannot be scanned or altered by public web users. |
+| **Security Boundary** | Confined strictly to authorized user folder. | Cloud host filesystem completely insulated. |
 
-To enforce hosted mode, set `HOSTED_MODE=true` in your environment.
+To configure hosted mode, set the environment variable:
+
+```bash
+export HOSTED_MODE=true
+```
 
 ---
 
-## Tests and Development Workflow
+## Tests and Development
 
 The test suite runs using Node's native test runner with TypeScript compilation:
 
 ```bash
-# Run complete test suite (24 automated tests)
+# Run the complete test suite (24 automated tests)
 npm test
 
-# Run build only
+# Run TypeScript compilation check
 npm run build
 
-# Run in development mode with live reload
+# Start with live reload for development
 npm run dev
 ```
 
-### Test Coverage Highlights
+### Test Suite Breakdown
 
-The test suite validates:
-- `core.test.ts`: File classification, boundary escape rejection, SHA-256 deduplication, CSV statistics, approval journal lifecycle.
-- `adversarial.test.ts`: Path traversal, symlink escapes, rollback overwrite safety, post-move modification detection, proposal forgery rejection, replay prevention, collision disambiguation, broken symlink clobber prevention, partial move recovery, persistence across process restarts, file size limits.
-- `provider.test.ts`: Model provider health detection, structured JSON response extraction, graceful fallback on endpoint failure, graceful fallback on invalid schema.
-- `server.test.ts`: Health check endpoint, execution list endpoint, hosted-mode filesystem rejection, payload validation, static file serving security.
+- **`src/tests/core.test.ts`**: Verifies file classification, boundary escape rejection, SHA-256 deduplication, CSV statistics calculation, and approval journal lifecycle.
+- **`src/tests/adversarial.test.ts`**: Verifies path traversal rejection, symlink escape defenses, rollback overwrite safety, post-move modification detection, proposal forgery rejection, replay prevention, collision disambiguation, broken symlink clobber prevention, partial move recovery, persistence across process restarts, and file size limits.
+- **`src/tests/provider.test.ts`**: Verifies model provider health detection, structured JSON response extraction, graceful fallback on endpoint failure, and graceful fallback on schema mismatch.
+- **`src/tests/server.test.ts`**: Verifies health check endpoint, execution list endpoint, hosted-mode filesystem rejection, payload validation, and static file serving security.
 
 ---
 
-## Render Deployment Instructions
+## Render Deployment
 
-The repository includes a ready-to-use Render Blueprint template in `render.yaml`.
+The repository includes a ready-to-deploy Render Blueprint template in [`render.yaml`](./render.yaml).
 
 ### 1. Blueprint Configuration
 
@@ -354,37 +442,37 @@ services:
 
 ### 2. Deployment Steps
 
-1. Fork or push the repository to GitHub.
+1. Push your changes to GitHub.
 2. In the Render Dashboard, select **New +** > **Blueprint**.
-3. Connect the repository. Render will automatically detect `render.yaml`.
+3. Select your repository. Render will automatically detect `render.yaml`.
 4. Click **Apply**.
 5. Once deployed, the service responds to `/api/health` with HTTP 200.
 
 ---
 
-## Honest Roadmap and Limitations
+## Roadmap and Limitations
 
-Transparency regarding current technical boundaries:
+To maintain full transparency with the open-source community:
 
-- **Local Inference Environment:** Real Gemma 3:4b inference requires a local Ollama instance with model weights pulled. On machines without Ollama running, the application operates on verified deterministic fallback.
-- **Hosted Filesystem Scanning:** Hosted mode intentionally rejects `/api/cleanup`, `/api/approve`, and `/api/rollback` to protect the host server. A future multi-user release will introduce isolated per-user upload sandboxes.
-- **File Format Scope:** Supported formats are TXT, Markdown, CSV, and JSON. PDF parsing, DOCX extraction, and image OCR are planned for subsequent iterations.
-- **Data Persistence:** The current local store writes to `.data/` using atomic JSON. Persistent disk attachments or an embedded SQLite adapter are planned for hosted durability.
+- **Local Inference Verification:** Real Gemma 3:4b inference requires a local Ollama instance with model weights pulled. On machines without Ollama running, the application operates on verified deterministic fallback. Public cloud deployment URLs have not been verified with active GPU inference.
+- **Hosted Filesystem Protection:** Hosted mode intentionally rejects `/api/cleanup`, `/api/approve`, and `/api/rollback` to protect the host server. A future release will introduce isolated per-session browser upload sandboxes.
+- **Supported File Types:** Current supported file formats are TXT, Markdown, CSV, and JSON. PDF parsing, DOCX extraction, and image OCR are planned for subsequent iterations.
+- **Data Persistence:** The local store writes to `.data/` using atomic JSON. Persistent disk attachments or an embedded SQLite adapter are planned for hosted multi-user durability.
 - **TabPFN Integration:** CSV profiling is deterministic. An optional TabPFN adapter remains in research to ensure proper Python isolation and licensing compliance prior to inclusion.
 
 ---
 
-## Contribution Guidelines
+## Contribution Guide
 
 Contributions are welcome. Please adhere to these guidelines:
 
-1. Maintain TypeScript strict mode with zero type errors.
-2. All new file operations must include path traversal, symlink escape, and rollback safety checks.
-3. Write clean, self-documenting code. Do not include extraneous inline code comments.
-4. Run `npm test` and ensure all test suites pass before submitting pull requests.
-5. Never commit private credentials, personal file paths, or `.data/` contents.
+1. **Strict TypeScript:** Maintain TypeScript strict mode with zero type errors (`npm run build`).
+2. **Defensive Verification:** All new file operations must include path traversal, symlink escape, and rollback safety checks.
+3. **No Code Comments:** Write clean, self-documenting code. Never add extraneous inline code comments in TypeScript, JavaScript, HTML, CSS, SVG, or configuration files.
+4. **Automated Testing:** Run `npm test` and ensure all test suites pass with zero regressions before submitting pull requests.
+5. **Privacy:** Never commit private credentials, personal file paths, or `.data/` contents.
 
-For detailed guidelines, refer to [CONTRIBUTING.md](./CONTRIBUTING.md).
+For detailed guidelines, refer to [CONTRIBUTING.md](./CONTRIBUTING.md) and [SECURITY.md](./SECURITY.md).
 
 ---
 

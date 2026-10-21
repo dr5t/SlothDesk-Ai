@@ -1,0 +1,203 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="960" height="540" fill="none">
+  <rect x="10" y="10" width="940" height="520" rx="16" fill="#252321"/>
+  <rect x="6" y="6" width="940" height="520" rx="16" fill="#f5f0e8" stroke="#252321" stroke-width="3"/>
+  
+  <g transform="translate(36, 28)">
+    <rect x="0" y="0" width="28" height="28" rx="6" fill="#f25c2a" stroke="#252321" stroke-width="2"/>
+    <text x="14" y="19" fill="#ffffff" font-family="'Space Mono', monospace" font-size="13" font-weight="900" text-anchor="middle">SD</text>
+    <text x="38" y="20" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="18" font-weight="900" letter-spacing="0.04em">SLOTHDESK AI — SYSTEM ARCHITECTURE</text>
+    <rect x="740" y="2" width="144" height="24" rx="4" fill="#252321"/>
+    <text x="812" y="18" fill="#fffaf2" font-family="'Space Mono', monospace" font-size="10" font-weight="700" text-anchor="middle">LOCAL-FIRST / VERIFIED</text>
+  </g>
+  <line x1="6" y1="68" x2="946" y2="68" stroke="#252321" stroke-width="2"/>
+
+  <g transform="translate(36, 88)">
+    <rect x="3" y="3" width="180" height="400" rx="10" fill="#252321"/>
+    <rect x="0" y="0" width="180" height="400" rx="10" fill="#ffffff" stroke="#252321" stroke-width="2"/>
+    <rect x="0" y="0" width="180" height="34" rx="10" fill="#f5f0e8"/>
+    <rect x="0" y="22" width="180" height="12" fill="#f5f0e8"/>
+    <line x1="0" y1="34" x2="180" y2="34" stroke="#252321" stroke-width="1.8"/>
+    <text x="12" y="22" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="800">1. CLIENT TIER</text>
+
+    <g transform="translate(12, 50)">
+      <rect x="2" y="2" width="156" height="64" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="156" height="64" rx="6" fill="#f5f0e8" stroke="#252321" stroke-width="1.5"/>
+      <text x="12" y="22" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="700">Developer / User</text>
+      <text x="12" y="38" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10.5">Explicit folder path entry</text>
+      <text x="12" y="52" fill="#f25c2a" font-family="'Space Mono', monospace" font-size="9.5" font-weight="700">NO AUTO-SCAN</text>
+    </g>
+
+    <path d="M78 120 L78 140" stroke="#252321" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="78,145 74,138 82,138" fill="#252321"/>
+
+    <g transform="translate(12, 150)">
+      <rect x="2" y="2" width="156" height="130" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="156" height="130" rx="6" fill="#fffaf2" stroke="#252321" stroke-width="1.5"/>
+      <text x="12" y="22" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="700">Web UI (Vanilla)</text>
+      <text x="12" y="40" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10.5">• Workspace Tab</text>
+      <text x="12" y="56" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10.5">• Review Center</text>
+      <text x="12" y="72" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10.5">• CSV Profiler Lab</text>
+      <text x="12" y="88" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10.5">• Activity &amp; Journal</text>
+      <rect x="12" y="100" width="132" height="18" rx="3" fill="#f5f0e8" stroke="#252321" stroke-width="1"/>
+      <text x="78" y="113" fill="#252321" font-family="'Space Mono', monospace" font-size="9" font-weight="700" text-anchor="middle">MLH TACTILE PRESS</text>
+    </g>
+
+    <g transform="translate(12, 300)">
+      <rect x="2" y="2" width="156" height="84" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="156" height="84" rx="6" fill="#f5f0e8" stroke="#252321" stroke-width="1.5"/>
+      <text x="12" y="22" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="700">Safe Static Server</text>
+      <text x="12" y="38" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10">Confined to /public</text>
+      <text x="12" y="52" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10">Blocks traversal &amp; nulls</text>
+      <text x="12" y="68" fill="#252321" font-family="'Space Mono', monospace" font-size="9" font-weight="700">ZERO FRAMEWORK BLOAT</text>
+    </g>
+  </g>
+
+  <path d="M222 220 L248 220" stroke="#252321" stroke-width="2.5" stroke-linecap="round"/>
+  <polygon points="254,220 246,216 246,224" fill="#252321"/>
+  <text x="238" y="210" fill="#5c5752" font-family="'Space Mono', monospace" font-size="9" font-weight="700" text-anchor="middle">JSON</text>
+
+  <g transform="translate(260, 88)">
+    <rect x="3" y="3" width="200" height="400" rx="10" fill="#252321"/>
+    <rect x="0" y="0" width="200" height="400" rx="10" fill="#ffffff" stroke="#252321" stroke-width="2"/>
+    <rect x="0" y="0" width="200" height="34" rx="10" fill="#f5f0e8"/>
+    <rect x="0" y="22" width="200" height="12" fill="#f5f0e8"/>
+    <line x1="0" y1="34" x2="200" y2="34" stroke="#252321" stroke-width="1.8"/>
+    <text x="12" y="22" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="800">2. BOUNDARY &amp; API</text>
+
+    <g transform="translate(12, 50)">
+      <rect x="2" y="2" width="176" height="74" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="176" height="74" rx="6" fill="#fffaf2" stroke="#252321" stroke-width="1.5"/>
+      <text x="12" y="22" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="700">Node.js HTTP Server</text>
+      <text x="12" y="38" fill="#5c5752" font-family="'Space Mono', monospace" font-size="10">src/server.ts</text>
+      <text x="12" y="52" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10.5">Strict schema &amp; verb checks</text>
+      <text x="12" y="66" fill="#252321" font-family="'Space Mono', monospace" font-size="9" font-weight="700">PORT: 3147</text>
+    </g>
+
+    <path d="M100 130 L100 148" stroke="#252321" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="100,154 96,146 104,146" fill="#252321"/>
+
+    <g transform="translate(12, 160)">
+      <rect x="2" y="2" width="176" height="96" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="176" height="96" rx="6" fill="#f5f0e8" stroke="#f25c2a" stroke-width="2"/>
+      <text x="12" y="22" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="800">Security Boundary</text>
+      <text x="12" y="38" fill="#5c5752" font-family="'Space Mono', monospace" font-size="10">safeWorkspacePath()</text>
+      <text x="12" y="52" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10.5">fs.realpath resolution</text>
+      <text x="12" y="68" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10.5">Blocks ../, escapes, nulls</text>
+      <text x="12" y="84" fill="#f25c2a" font-family="'Space Mono', monospace" font-size="9" font-weight="700">SYMLINK DEFENSE</text>
+    </g>
+
+    <g transform="translate(12, 280)">
+      <rect x="2" y="2" width="176" height="104" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="176" height="104" rx="6" fill="#fffaf2" stroke="#252321" stroke-width="1.5"/>
+      <text x="12" y="22" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="700">Hosted Mode Guard</text>
+      <text x="12" y="38" fill="#5c5752" font-family="'Space Mono', monospace" font-size="9.5">HOSTED_MODE=true</text>
+      <text x="12" y="52" fill="#f25c2a" font-family="-apple-system, sans-serif" font-size="10" font-weight="700">Rejects all scan &amp; move</text>
+      <text x="12" y="66" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10">Protects host disk on Render</text>
+      <text x="12" y="84" fill="#252321" font-family="'Space Mono', monospace" font-size="9" font-weight="700">HTTP 403 ENFORCED</text>
+    </g>
+  </g>
+
+  <path d="M466 220 L492 220" stroke="#252321" stroke-width="2.5" stroke-linecap="round"/>
+  <polygon points="498,220 490,216 490,224" fill="#252321"/>
+
+  <g transform="translate(504, 88)">
+    <rect x="3" y="3" width="210" height="400" rx="10" fill="#252321"/>
+    <rect x="0" y="0" width="210" height="400" rx="10" fill="#ffffff" stroke="#252321" stroke-width="2"/>
+    <rect x="0" y="0" width="210" height="34" rx="10" fill="#f5f0e8"/>
+    <rect x="0" y="22" width="210" height="12" fill="#f5f0e8"/>
+    <line x1="0" y1="34" x2="210" y2="34" stroke="#252321" stroke-width="1.8"/>
+    <text x="12" y="22" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="800">3. WORKFLOW ENGINE</text>
+
+    <g transform="translate(12, 46)">
+      <rect x="2" y="2" width="186" height="58" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="186" height="58" rx="6" fill="#fffaf2" stroke="#252321" stroke-width="1.5"/>
+      <text x="10" y="18" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="700">Workspace Scanner</text>
+      <text x="10" y="32" fill="#5c5752" font-family="'Space Mono', monospace" font-size="9.5">Streaming SHA-256 hash</text>
+      <text x="10" y="46" fill="#f25c2a" font-family="'Space Mono', monospace" font-size="9" font-weight="700">DEDUPLICATION DETECTION</text>
+    </g>
+
+    <g transform="translate(12, 114)">
+      <rect x="2" y="2" width="186" height="74" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="186" height="74" rx="6" fill="#f5f0e8" stroke="#252321" stroke-width="1.5"/>
+      <circle cx="16" cy="18" r="4" fill="#f25c2a"/>
+      <text x="26" y="20" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="700">Local Ollama / Gemma</text>
+      <text x="10" y="38" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10">Gemma 3:4b on-device</text>
+      <text x="10" y="52" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10">Structured JSON extraction</text>
+      <text x="10" y="66" fill="#252321" font-family="'Space Mono', monospace" font-size="9" font-weight="700">OPEN-WEIGHT INFERENCE</text>
+    </g>
+
+    <g transform="translate(12, 198)">
+      <rect x="2" y="2" width="186" height="64" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="186" height="64" rx="6" fill="#fffaf2" stroke="#252321" stroke-width="1.5"/>
+      <circle cx="16" cy="18" r="4" fill="#5c5752"/>
+      <text x="26" y="20" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="700">Deterministic Fallback</text>
+      <text x="10" y="36" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10">Regex task parsing</text>
+      <text x="10" y="50" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10">Offline resiliency guarantee</text>
+    </g>
+
+    <g transform="translate(12, 272)">
+      <rect x="2" y="2" width="186" height="52" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="186" height="52" rx="6" fill="#fffaf2" stroke="#252321" stroke-width="1.5"/>
+      <text x="10" y="18" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="700">Deterministic CSV Profiler</text>
+      <text x="10" y="32" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10">Rows, nulls, types, summary</text>
+      <text x="10" y="44" fill="#252321" font-family="'Space Mono', monospace" font-size="9" font-weight="700">PURE TYPESCRIPT</text>
+    </g>
+
+    <g transform="translate(12, 334)">
+      <rect x="2" y="2" width="186" height="50" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="186" height="50" rx="6" fill="#f5f0e8" stroke="#252321" stroke-width="1.5"/>
+      <text x="10" y="18" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="700">Collision Disambiguation</text>
+      <text x="10" y="32" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10">name-1.ext, name-2.ext</text>
+      <text x="10" y="44" fill="#f25c2a" font-family="'Space Mono', monospace" font-size="9" font-weight="700">PREVENTS CLOBBERING</text>
+    </g>
+  </g>
+
+  <path d="M720 220 L746 220" stroke="#252321" stroke-width="2.5" stroke-linecap="round"/>
+  <polygon points="752,220 744,216 744,224" fill="#252321"/>
+
+  <g transform="translate(758, 88)">
+    <rect x="3" y="3" width="166" height="400" rx="10" fill="#252321"/>
+    <rect x="0" y="0" width="166" height="400" rx="10" fill="#ffffff" stroke="#252321" stroke-width="2"/>
+    <rect x="0" y="0" width="166" height="34" rx="10" fill="#f5f0e8"/>
+    <rect x="0" y="22" width="166" height="12" fill="#f5f0e8"/>
+    <line x1="0" y1="34" x2="166" y2="34" stroke="#252321" stroke-width="1.8"/>
+    <text x="10" y="22" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="800">4. APPROVAL &amp; EXEC</text>
+
+    <g transform="translate(10, 48)">
+      <rect x="2" y="2" width="146" height="74" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="146" height="74" rx="6" fill="#f5f0e8" stroke="#f25c2a" stroke-width="2"/>
+      <text x="8" y="20" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="800">Approval Gate</text>
+      <text x="8" y="36" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10">UUID-keyed execution</text>
+      <text x="8" y="50" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10">Server authoritative</text>
+      <text x="8" y="66" fill="#f25c2a" font-family="'Space Mono', monospace" font-size="9" font-weight="700">HUMAN DECIDES</text>
+    </g>
+
+    <path d="M80 130 L80 148" stroke="#252321" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="80,154 76,146 84,146" fill="#252321"/>
+
+    <g transform="translate(10, 160)">
+      <rect x="2" y="2" width="146" height="66" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="146" height="66" rx="6" fill="#fffaf2" stroke="#252321" stroke-width="1.5"/>
+      <text x="8" y="20" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="700">Atomic Move</text>
+      <text x="8" y="36" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10">lstat checks &amp; fs.rename</text>
+      <text x="8" y="50" fill="#252321" font-family="'Space Mono', monospace" font-size="9" font-weight="700">REVERSIBLE MOVE</text>
+    </g>
+
+    <g transform="translate(10, 238)">
+      <rect x="2" y="2" width="146" height="66" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="146" height="66" rx="6" fill="#fffaf2" stroke="#252321" stroke-width="1.5"/>
+      <text x="8" y="20" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="700">Atomic Journal</text>
+      <text x="8" y="36" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="10">.data/ POSIX renames</text>
+      <text x="8" y="50" fill="#252321" font-family="'Space Mono', monospace" font-size="9" font-weight="700">CRASH-RESILIENT</text>
+    </g>
+
+    <g transform="translate(10, 316)">
+      <rect x="2" y="2" width="146" height="70" rx="6" fill="#252321"/>
+      <rect x="0" y="0" width="146" height="70" rx="6" fill="#f5f0e8" stroke="#252321" stroke-width="1.5"/>
+      <text x="8" y="20" fill="#252321" font-family="'Space Grotesk', sans-serif" font-size="11" font-weight="700">Rollback Engine</text>
+      <text x="8" y="34" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="9.5">Pre-move hash check</text>
+      <text x="8" y="48" fill="#5c5752" font-family="-apple-system, sans-serif" font-size="9.5">Refuses overwrite</text>
+      <text x="8" y="62" fill="#f25c2a" font-family="'Space Mono', monospace" font-size="8.5" font-weight="700">100% SAFE RESTORE</text>
+    </g>
+  </g>
+</svg>
