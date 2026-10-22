@@ -33,8 +33,11 @@ export interface Proposal {
   sourcePath: string;
   destinationPath: string;
   reason: string;
-  status: "pending" | "approved" | "rejected" | "completed" | "failed";
+  status: "pending" | "approved" | "rejected" | "completed" | "failed" | "rolled_back";
   reportSource?: string;
+  operationType?: string;
+  provider?: "ollama" | "deterministic";
+  warning?: string;
 }
 
 export interface DocumentReport {
@@ -54,7 +57,7 @@ export interface DocumentReport {
 export interface Execution {
   id: string;
   workspace: string;
-  status: "completed" | "failed";
+  status: "completed" | "failed" | "rolled_back";
   startedAt: string;
   endedAt: string;
   filesProcessed: number;

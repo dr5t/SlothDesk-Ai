@@ -67,11 +67,16 @@ export async function runCleanup(workspace: string, provider: ModelProvider = de
         usedDestinations.add(candidateDest);
         const p = proposal(record.path, candidateDest, "Category suggested from document signals.");
         p.reportSource = record.relativePath;
-        proposals.push(p);
+        p.operationType = "categorize_move";
         const lastReport = reports.at(-1);
         if (lastReport) {
           lastReport.proposalId = p.id;
+          p.provider = lastReport.provider;
         }
+        if (counter > 1) {
+          p.warning = `Collision prevented: destination auto-disambiguated with suffix to "${path.basename(candidateDest)}".`;
+        }
+        proposals.push(p);
       }
     } catch (error) {
       errors.push(`${record.relativePath}: ${error instanceof Error ? error.message : "Unable to process file"}`);
@@ -81,11 +86,16 @@ export async function runCleanup(workspace: string, provider: ModelProvider = de
   for (const record of records.filter((item) => item.duplicateOf)) {
     const p = proposal(record.path, record.path, `Duplicate of ${record.duplicateOf}; review before removal.`);
     p.reportSource = record.relativePath;
-    proposals.push(p);
+    p.operationType = "duplicate_review";
+    p.warning = "Cryptographic duplicate: identical content to existing file. File deletion is never automated.";
     const rep = reports.find((item) => item.source === record.relativePath);
-    if (rep && !rep.proposalId) {
-      rep.proposalId = p.id;
+    if (rep) {
+      if (!rep.proposalId) rep.proposalId = p.id;
+      p.provider = rep.provider;
+    } else {
+      p.provider = "deterministic";
     }
+    proposals.push(p);
   }
 
   const automatedMinutes = (Date.now() - started) / 60_000;
@@ -117,7 +127,7 @@ export async function approveOperations(execution: Execution, approvedIds: strin
   const results = [];
 
   for (const item of stored.proposals) {
-    if (!approved.has(item.id) || item.status !== "pending" || item.destinationPath === item.sourcePath) continue;
+    if (!approved.has(item.id) || (item.status !== "pending" && item.status !== "rolled_back") || item.destinationPath === item.sourcePath) continue;
     try {
       const workspace = stored.workspace;
       const source = safeWorkspacePath(workspace, path.relative(workspace, item.sourcePath));
@@ -157,8 +167,9 @@ export async function approveOperations(execution: Execution, approvedIds: strin
       results.push({ id: item.id, status: "completed" });
     } catch (error) {
       item.status = "failed";
+      item.warning = error instanceof Error ? error.message : "Operation failed";
       await saveExecution(stored);
-      results.push({ id: item.id, status: "failed", error: error instanceof Error ? error.message : "Operation failed" });
+      results.push({ id: item.id, status: "failed", error: item.warning });
     }
   }
 
@@ -210,7 +221,7 @@ export async function rollbackExecution(executionId: string) {
 
       const proposal = execution.proposals.find((item) => item.id === entry.proposalId);
       if (proposal) {
-        proposal.status = "pending";
+        proposal.status = "rolled_back";
         await saveExecution(execution);
       }
 

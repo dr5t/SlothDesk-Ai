@@ -86,27 +86,30 @@
       <div class="section-head">
         <div>
           <div class="eyebrow">02 / COMPOSE + EXECUTE</div>
-          <h2>Automation Studio</h2>
+          <h2>Automation Recipes</h2>
+        </div>
+        <span id="recipesStatus" class="status">4 recipes ready</span>
+      </div>
+      <p class="lede" style="font-size: 15px; margin-bottom: 24px;">Pre-configured, non-destructive automation workflows built on verified local pipeline stages. Each recipe executes a real dry-run preview and stages file operations in Review Center for explicit human sign-off.</p>
+      <div class="run-card">
+        <label for="recipeWorkspace">Authorized workspace folder</label>
+        <div class="input-row">
+          <input id="recipeWorkspace" placeholder="/tmp/slothdesk-demo">
+          <button id="syncWorkspaceBtn" class="button">Sync from Workspace ↵</button>
+        </div>
+        <small>Target folder for recipe dry runs. Preset shortcut: <span class="preset-chip" id="presetRecipeDemo">demo-workspace</span>. File operations always require explicit approval.</small>
+      </div>
+      <div id="recipeCards" class="recipes-grid"></div>
+      <div class="section-head" style="margin-top: 40px;">
+        <div>
+          <div class="eyebrow">DRY-RUN EXECUTION SUMMARY</div>
+          <h3>Recipe Results</h3>
         </div>
       </div>
-      <div class="studio-grid">
-        <article class="panel">
-          <span class="card-number">01</span>
-          <h3>Lazy Cleanup</h3>
-          <p>Discover files, extract tasks, categorize documents, and pause for explicit human review.</p>
-          <button class="button primary" data-go="workspace">Configure workspace ↘</button>
-        </article>
-        <article class="panel">
-          <span class="card-number">02</span>
-          <h3>Pipeline Stages</h3>
-          <ol>
-            <li>Inventory files and calculate SHA-256 hashes</li>
-            <li>Extract tasks and profile tabular CSV schemas</li>
-            <li>Generate proposals with collision disambiguation</li>
-            <li>Require explicit selection in Review Center</li>
-            <li>Execute atomic moves with hash-checked rollback</li>
-          </ol>
-        </article>
+      <div id="recipeRunResult" class="result empty">
+        <div class="empty-icon">✦</div>
+        <h3>No recipe executed yet.</h3>
+        <p>Select any automation recipe above to run a dry-run analysis and view generated proposals.</p>
       </div>
     </section>
     <section id="review" class="view">
@@ -238,6 +241,7 @@
           <p>Local mode reads only an authorized path. Hosted mode strictly rejects filesystem operations to protect the server host.</p>
         </article>
       </div>
+      <div id="inspectorContainer" class="inspector-wrapper" style="display: none; margin-top: 28px;"></div>
       <h3 style="font-size: 22px; letter-spacing: -0.02em; margin: 32px 0 16px;">Execution History</h3>
       <div id="history" class="history"></div>
     </section>
@@ -249,6 +253,20 @@
   <script>
     const $ = id => document.getElementById(id);
     let currentExecution = null;
+    let availableRecipes = [];
+    let isRecipeRunning = false;
+    let reviewFilter = 'all';
+    let selectedProposalIds = new Set();
+    function initSelectedProposals() {
+      selectedProposalIds.clear();
+      if (currentExecution && currentExecution.proposals) {
+        currentExecution.proposals.forEach(p => {
+          if (p.status === 'pending' && p.sourcePath !== p.destinationPath) {
+            selectedProposalIds.add(p.id);
+          }
+        });
+      }
+    }
     const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
     const api = async (url, options) => {
       const response = await fetch(url, options);
@@ -282,11 +300,17 @@
       if (view === 'ai') loadAiStatus();
       if (view === 'activity' || view === 'dashboard') loadHistory();
       if (view === 'review') renderReview();
+      if (view === 'studio') loadRecipes();
+      if (view === 'csv') renderCsvLab();
     }
     document.querySelectorAll('.tab').forEach(x => x.onclick = () => show(x.dataset.view));
     document.querySelectorAll('[data-go]').forEach(x => x.onclick = () => show(x.dataset.go));
     $('brandLink').onclick = e => { e.preventDefault(); show('dashboard'); };
-    $('presetDemo').onclick = () => { $('workspacePath').value = 'demo-workspace'; };
+    $('presetDemo').onclick = () => {
+      $('workspacePath').value = 'demo-workspace';
+      const rw = $('recipeWorkspace');
+      if (rw && !rw.value.trim()) rw.value = 'demo-workspace';
+    };
     function metric(label, value) {
       return `<div class="metric-item"><b>${value}</b><span>${label}</span></div>`;
     }
@@ -490,20 +514,246 @@
               <p>${new Date(x.startedAt).toLocaleString()}</p>
             </article>
           `).join('');
-          $('history').innerHTML = data.map(x => `
-            <div class="history-row">
-              <b>${esc(x.id.slice(0, 8))}</b>
-              <span>${x.filesProcessed} files · ${x.tasksExtracted} tasks · ${x.estimatedNetMinutesSaved.toFixed(1)} min saved · ${new Date(x.startedAt).toLocaleDateString()}</span>
-              <span class="history-status" style="color: ${x.status === 'completed' ? 'var(--success)' : 'var(--danger)'}">${esc(x.status)}</span>
-            </div>
-          `).join('');
+          $('history').innerHTML = data.map(x => {
+            const proposals = Array.isArray(x.proposals) ? x.proposals : [];
+            const reports = Array.isArray(x.reports) ? x.reports : [];
+            const errors = Array.isArray(x.errors) ? x.errors : [];
+            const completed = proposals.filter(p => p.status === 'completed').length;
+            const failed = proposals.filter(p => p.status === 'failed').length;
+            const rolledBack = proposals.filter(p => p.status === 'rolled_back').length;
+
+            let durationStr = 'N/A';
+            if (x.startedAt && x.endedAt) {
+              const s = new Date(x.startedAt).getTime();
+              const e = new Date(x.endedAt).getTime();
+              if (!isNaN(s) && !isNaN(e) && e >= s) {
+                durationStr = ((e - s) / 1000).toFixed(2) + 's';
+              }
+            }
+            if (durationStr === 'N/A' && typeof x.automatedMinutes === 'number' && x.automatedMinutes > 0) {
+              durationStr = (x.automatedMinutes * 60).toFixed(1) + 's';
+            }
+
+            const hasOllama = reports.some(r => r.provider === 'ollama');
+            const hasDet = reports.some(r => r.provider === 'deterministic');
+            const providerBadge = hasOllama && hasDet ? 'Mixed' : hasOllama ? 'Local Model (Gemma)' : 'Deterministic';
+
+            return `
+              <article class="execution-card" id="exec-${esc(x.id)}">
+                <div class="execution-card-head">
+                  <div class="execution-id-meta">
+                    <span class="mono-badge">${esc(x.id.slice(0, 8))}</span>
+                    <span class="status-pill status-${esc(x.status)}">${esc(x.status.toUpperCase().replace('_', ' '))}</span>
+                    <span class="provider-pill">${esc(providerBadge)}</span>
+                    ${errors.length > 0 ? `<span class="error-pill">⚠️ ${errors.length} Error${errors.length === 1 ? '' : 's'}</span>` : ''}
+                  </div>
+                  <div class="execution-time">
+                    <span>${x.startedAt ? new Date(x.startedAt).toLocaleString() : 'N/A'}</span>
+                    <span class="duration-tag">⏱ ${durationStr} measured</span>
+                  </div>
+                </div>
+                <div class="execution-stats-grid">
+                  <div class="stat-cell"><span class="stat-label">Files</span><span class="stat-val">${x.filesProcessed || 0}</span></div>
+                  <div class="stat-cell"><span class="stat-label">Duplicates</span><span class="stat-val">${x.duplicates || 0}</span></div>
+                  <div class="stat-cell"><span class="stat-label">Proposals</span><span class="stat-val">${proposals.length}</span></div>
+                  <div class="stat-cell"><span class="stat-label">Completed</span><span class="stat-val text-success">${completed}</span></div>
+                  <div class="stat-cell"><span class="stat-label">Failed</span><span class="stat-val text-danger">${failed}</span></div>
+                  <div class="stat-cell"><span class="stat-label">Rolled Back</span><span class="stat-val text-warning">${rolledBack}</span></div>
+                </div>
+                <div class="execution-card-footer">
+                  <div class="time-saved-badge">
+                    <span>Est. Net Saved: <b>~${(Number(x.estimatedNetMinutesSaved) || 0).toFixed(1)}m</b> (heuristic model)</span>
+                  </div>
+                  <div class="execution-actions">
+                    <button class="button small" onclick="inspectExecution('${esc(x.id)}')">Inspect Details ↘</button>
+                    <button class="button small" onclick="downloadExecutionReport('${esc(x.id)}', 'markdown')">Export MD ⤓</button>
+                    <button class="button small" onclick="downloadExecutionReport('${esc(x.id)}', 'json')">Export JSON ⤓</button>
+                  </div>
+                </div>
+              </article>
+            `;
+          }).join('');
         }
       } catch (err) {
         $('dashboardStatus').textContent = 'Unable to load history';
       }
     }
+    async function inspectExecution(id) {
+      const container = $('inspectorContainer');
+      if (!container) return;
+      container.style.display = 'block';
+      container.innerHTML = '<div class="notice">Loading execution details…</div>';
+      container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      try {
+        const res = await api(`/api/executions/${encodeURIComponent(id)}`);
+        const ex = res.execution;
+        const m = res.metrics;
+        const proposals = Array.isArray(ex.proposals) ? ex.proposals : [];
+        const reports = Array.isArray(ex.reports) ? ex.reports : [];
+        const errors = Array.isArray(ex.errors) ? ex.errors : [];
+
+        container.innerHTML = `
+          <article class="inspector-card">
+            <div class="inspector-header">
+              <div>
+                <div class="eyebrow">EXECUTION INSPECTOR</div>
+                <h3 class="inspector-title">
+                  <span class="mono-badge big">${esc(ex.id)}</span>
+                  <span class="status-pill status-${esc(ex.status)}">${esc(ex.status.toUpperCase().replace('_', ' '))}</span>
+                </h3>
+              </div>
+              <button class="button small" onclick="closeInspector()">✕ Close Inspector</button>
+            </div>
+
+            <div class="inspector-export-bar">
+              <div class="export-options">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="inspectorSanitize" checked />
+                  <span>Sanitize local filesystem paths (recommended for shared reports)</span>
+                </label>
+              </div>
+              <div class="export-btn-group">
+                <button class="button primary small" onclick="downloadExecutionReport('${esc(ex.id)}', 'markdown', $('inspectorSanitize').checked)">Export Markdown (.md) ⤓</button>
+                <button class="button small" onclick="downloadExecutionReport('${esc(ex.id)}', 'json', $('inspectorSanitize').checked)">Export JSON (.json) ⤓</button>
+                <button class="button small" onclick="loadExecutionIntoReview('${esc(ex.id)}')">Open in Review Center ↘</button>
+              </div>
+            </div>
+
+            <div class="inspector-metrics-grid">
+              <div class="metric-box">
+                <span class="label">Measured Runtime</span>
+                <span class="val">${m.durationSeconds.toFixed(3)}s</span>
+                <span class="sub">Verified automated clock duration</span>
+              </div>
+              <div class="metric-box">
+                <span class="label">Estimated Net Time Saved</span>
+                <span class="val">~${m.estimatedNetMinutesSaved.toFixed(1)} min</span>
+                <span class="sub">Projected human time saving estimate</span>
+              </div>
+              <div class="metric-box">
+                <span class="label">Files & Duplicates</span>
+                <span class="val">${m.filesProcessed} / ${m.duplicates}</span>
+                <span class="sub">Files scanned / duplicates found</span>
+              </div>
+              <div class="metric-box">
+                <span class="label">Operations Breakdown</span>
+                <span class="val">${m.completed} ok · ${m.failed} err · ${m.rolledBack} rb</span>
+                <span class="sub">${m.pending} pending of ${m.proposalsTotal} total</span>
+              </div>
+              <div class="metric-box" style="grid-column: span 2;">
+                <span class="label">Processing Provider</span>
+                <span class="val" style="font-size: 16px;">${esc(m.providerName)}</span>
+                <span class="sub">Execution engine used for document intelligence</span>
+              </div>
+            </div>
+
+            <div class="methodology-banner">
+              <strong>📐 Time Savings Estimation Methodology:</strong>
+              <p>${esc(m.estimationMethod)}</p>
+            </div>
+
+            ${errors.length > 0 ? `
+              <div class="inspector-errors">
+                <h4>Errors & Diagnostics (${errors.length})</h4>
+                <div class="error-list">
+                  ${errors.map(err => `<div class="error-item">⚠️ ${esc(err)}</div>`).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            <div class="inspector-proposals-section">
+              <h4>Staged Proposals & Operations (${proposals.length})</h4>
+              ${proposals.length === 0 ? '<p class="empty-sub">No staged proposals in this execution record.</p>' : `
+                <div class="inspector-table-wrapper">
+                  <table class="inspector-table">
+                    <thead>
+                      <tr>
+                        <th>Source</th>
+                        <th>Destination</th>
+                        <th>Operation</th>
+                        <th>Status</th>
+                        <th>Provider</th>
+                        <th>Reason</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${proposals.map(p => `
+                        <tr>
+                          <td class="mono-cell">${esc(p.sourcePath)}</td>
+                          <td class="mono-cell">${esc(p.destinationPath)}</td>
+                          <td><span class="op-tag">${esc(p.operationType || (p.sourcePath === p.destinationPath ? 'duplicate_review' : 'categorize_move'))}</span></td>
+                          <td><span class="status-pill status-${esc(p.status)}">${esc((p.status || 'pending').toUpperCase().replace('_', ' '))}</span></td>
+                          <td><span class="provider-pill">${esc(p.provider || 'deterministic')}</span></td>
+                          <td>${esc(p.reason || '')}${p.warning ? `<span class="warning-tag">⚠️ ${esc(p.warning)}</span>` : ''}</td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              `}
+            </div>
+
+            ${reports.length > 0 ? `
+              <div class="inspector-reports-section">
+                <h4>Document Intelligence Findings (${reports.length})</h4>
+                <div class="inspector-reports-grid">
+                  ${reports.map(r => `
+                    <div class="inspector-report-item">
+                      <div class="report-head">
+                        <span class="mono-badge">${esc(r.source)}</span>
+                        <span class="provider-pill">${esc(r.provider)}</span>
+                      </div>
+                      <p><strong>Category:</strong> ${esc(r.category)}</p>
+                      <p><strong>Summary:</strong> ${esc(r.summary)}</p>
+                      <div class="report-counts">
+                        <span>Tasks: ${Array.isArray(r.tasks) ? r.tasks.length : 0}</span>
+                        <span>Decisions: ${Array.isArray(r.decisions) ? r.decisions.length : 0}</span>
+                        <span>Deadlines: ${Array.isArray(r.deadlines) ? r.deadlines.length : 0}</span>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+          </article>
+        `;
+      } catch (err) {
+        container.innerHTML = `<div class="notice" style="color: var(--danger)">Unable to inspect execution: ${esc(err.message || String(err))}</div>`;
+      }
+    }
+    function closeInspector() {
+      const container = $('inspectorContainer');
+      if (container) {
+        container.style.display = 'none';
+        container.innerHTML = '';
+      }
+    }
+    function downloadExecutionReport(id, format, sanitize = true) {
+      const url = `/api/executions/${encodeURIComponent(id)}/export?format=${encodeURIComponent(format)}&sanitize=${sanitize ? 'true' : 'false'}`;
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `slothdesk-execution-${id.slice(0, 8)}.${format === 'json' ? 'json' : 'md'}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    function loadExecutionIntoReview(id) {
+      api(`/api/executions/${encodeURIComponent(id)}`).then(res => {
+        if (res && res.execution) {
+          currentExecution = res.execution;
+          initSelectedProposals();
+          show('review');
+          renderReview();
+        }
+      }).catch(() => {
+        show('review');
+      });
+    }
     function openProposalInReview(id) {
+      reviewFilter = 'all';
       show('review');
+      renderReview();
       setTimeout(() => {
         const el = document.getElementById('proposal-' + id);
         if (el) {
@@ -511,46 +761,204 @@
           el.classList.add('highlighted');
           setTimeout(() => el.classList.remove('highlighted'), 2400);
         }
-      }, 80);
+      }, 100);
     }
     function renderReview() {
-      if (!currentExecution) {
-        $('reviewQueue').className = 'result empty';
-        $('reviewQueue').innerHTML = `
+      const container = $('reviewQueue');
+      if (!container) return;
+      if (!currentExecution || !currentExecution.proposals || currentExecution.proposals.length === 0) {
+        container.className = 'result empty';
+        container.innerHTML = `
           <div class="empty-icon">✦</div>
           <h3>No pending review.</h3>
-          <p>Run a dry-run scan from the Workspace tab to generate review proposals.</p>
+          <p>Run a dry-run scan from the Workspace tab or trigger an Automation Recipe to generate proposals.</p>
           <button class="button primary" onclick="show('workspace')">Go to Workspace ↘</button>
         `;
         return;
       }
-      const pending = currentExecution.proposals.filter(x => x.status === 'pending');
-      const hasCompleted = currentExecution.proposals.some(x => x.status === 'completed');
-      $('reviewQueue').className = 'result';
-      let html = '';
-      if (pending.length) {
-        html += `<div class="proposals">${pending.map(p => `
-          <label class="proposal-item" id="proposal-${p.id}">
-            <input type="checkbox" value="${p.id}" checked>
-            <span class="proposal-text">
-              <strong>${esc(p.sourcePath.split('/').pop())}</strong> → ${esc(p.destinationPath.replace(currentExecution.workspace, ''))}
-              <small>${esc(p.reason)}</small>
-              ${p.reportSource ? `<small class="proposal-source">Source Document: <strong>${esc(p.reportSource)}</strong></small>` : ''}
-            </span>
-          </label>
-        `).join('')}</div>`;
-      } else {
-        html += '<div class="notice">There are no pending proposals in this execution queue.</div>';
+
+      const proposals = currentExecution.proposals;
+      const totalCount = proposals.length;
+      const pendingCount = proposals.filter(p => p.status === 'pending').length;
+      const completedCount = proposals.filter(p => p.status === 'completed').length;
+      const failedCount = proposals.filter(p => p.status === 'failed').length;
+      const rolledBackCount = proposals.filter(p => p.status === 'rolled_back').length;
+
+      const eligiblePending = proposals.filter(p => p.status === 'pending' && p.sourcePath !== p.destinationPath);
+      for (const id of Array.from(selectedProposalIds)) {
+        if (!eligiblePending.some(p => p.id === id)) {
+          selectedProposalIds.delete(id);
+        }
       }
-      html += '<div class="review-actions">';
-      if (pending.length) {
-        html += '<button id="approve" class="button primary">Approve selected operations</button>';
+
+      let displayed = proposals;
+      if (reviewFilter === 'pending') displayed = displayed.filter(p => p.status === 'pending');
+      else if (reviewFilter === 'completed') displayed = displayed.filter(p => p.status === 'completed');
+      else if (reviewFilter === 'failed') displayed = displayed.filter(p => p.status === 'failed');
+      else if (reviewFilter === 'rolled_back') displayed = displayed.filter(p => p.status === 'rolled_back');
+
+      const selectedProposals = proposals.filter(p => selectedProposalIds.has(p.id));
+
+      container.className = 'result';
+      container.innerHTML = `
+        <div class="review-meta-bar">
+          <span class="review-meta-item">Execution: <code>${esc(currentExecution.id.slice(0, 8))}</code></span>
+          <span class="review-meta-item">Workspace: <code>${esc(currentExecution.workspace)}</code></span>
+          <span class="review-meta-item">Total Proposals: <b>${totalCount}</b></span>
+        </div>
+
+        <div class="review-filter-tabs" role="tablist" aria-label="Proposal status filters">
+          <button type="button" class="filter-tab ${reviewFilter === 'all' ? 'active' : ''}" data-filter="all">All (${totalCount})</button>
+          <button type="button" class="filter-tab ${reviewFilter === 'pending' ? 'active' : ''}" data-filter="pending">Pending (${pendingCount})</button>
+          <button type="button" class="filter-tab ${reviewFilter === 'completed' ? 'active' : ''}" data-filter="completed">Completed (${completedCount})</button>
+          <button type="button" class="filter-tab ${reviewFilter === 'failed' ? 'active' : ''}" data-filter="failed">Failed (${failedCount})</button>
+          <button type="button" class="filter-tab ${reviewFilter === 'rolled_back' ? 'active' : ''}" data-filter="rolled_back">Rolled Back (${rolledBackCount})</button>
+        </div>
+
+        <div class="review-toolbar">
+          <div class="selection-actions">
+            <button type="button" class="button small" id="selectAllBtn" ${eligiblePending.length === 0 ? 'disabled' : ''}>Select All Pending</button>
+            <button type="button" class="button small" id="deselectAllBtn" ${selectedProposalIds.size === 0 ? 'disabled' : ''}>Deselect All</button>
+          </div>
+          <div class="selection-status-badge">
+            <span>${selectedProposalIds.size} of ${eligiblePending.length} eligible pending selected</span>
+          </div>
+        </div>
+
+        ${displayed.length === 0 ? `
+          <div class="notice">No ${reviewFilter === 'all' ? '' : reviewFilter.replace('_', ' ') + ' '}proposals found in this execution.</div>
+        ` : `
+          <div class="proposals-list">
+            ${displayed.map(p => {
+              const isEligible = p.status === 'pending' && p.sourcePath !== p.destinationPath;
+              const filename = p.sourcePath.split('/').pop() || p.sourcePath;
+              const sourceRel = p.sourcePath.startsWith(currentExecution.workspace)
+                ? p.sourcePath.slice(currentExecution.workspace.length).replace(/^[\/\\]+/, '')
+                : p.sourcePath;
+              const destRel = p.destinationPath.startsWith(currentExecution.workspace)
+                ? p.destinationPath.slice(currentExecution.workspace.length).replace(/^[\/\\]+/, '')
+                : p.destinationPath;
+              const opType = p.operationType || (p.sourcePath === p.destinationPath ? 'duplicate_review' : 'categorize_move');
+              const opLabel = opType === 'duplicate_review' ? 'DUPLICATE REVIEW' : (opType === 'categorize_move' ? 'ORGANIZE & MOVE' : 'RELOCATE');
+              const rep = currentExecution.reports.find(r => r.proposalId === p.id || r.source === p.reportSource);
+              const provider = p.provider || (rep ? rep.provider : 'deterministic');
+              const providerLabel = provider === 'ollama' ? 'OPEN-WEIGHT (GEMMA 3)' : 'DETERMINISTIC HEURISTIC';
+              const status = p.status || 'pending';
+              const statusLabel = status.toUpperCase().replace('_', ' ');
+              const statusClass = 'status-' + status;
+              const warning = p.warning || (p.sourcePath === p.destinationPath ? 'Cryptographic duplicate: identical content to existing file. File deletion is never automated.' : '');
+
+              return `
+                <article class="proposal-card ${isEligible && selectedProposalIds.has(p.id) ? 'selected' : ''}" id="proposal-${p.id}">
+                  <div class="proposal-card-top">
+                    <div class="proposal-select-cell">
+                      ${isEligible ? `
+                        <input type="checkbox" class="proposal-select-cb" data-id="${p.id}" ${selectedProposalIds.has(p.id) ? 'checked' : ''} aria-label="Select ${esc(filename)}">
+                      ` : `
+                        <span class="proposal-no-cb" title="Not eligible for approval in current state">—</span>
+                      `}
+                    </div>
+                    <div class="proposal-heading-block">
+                      <div class="proposal-badges">
+                        <span class="proposal-badge op-badge">${esc(opLabel)}</span>
+                        <span class="proposal-badge provider-badge">${esc(providerLabel)}</span>
+                        <span class="proposal-badge ${statusClass}">${esc(statusLabel)}</span>
+                      </div>
+                      <h4 class="proposal-filename">${esc(filename)}</h4>
+                    </div>
+                  </div>
+
+                  <div class="proposal-path-grid">
+                    <div class="path-block">
+                      <span class="path-label">ORIGINAL PATH</span>
+                      <code class="path-value">${esc(sourceRel)}</code>
+                    </div>
+                    <div class="path-arrow">→</div>
+                    <div class="path-block">
+                      <span class="path-label">PROPOSED DESTINATION</span>
+                      <code class="path-value ${p.sourcePath === p.destinationPath ? 'same-dest' : 'new-dest'}">${esc(destRel)}</code>
+                    </div>
+                  </div>
+
+                  <div class="proposal-reason-block">
+                    <span class="reason-label">RECOMMENDATION REASON</span>
+                    <p class="reason-text">${esc(p.reason)}</p>
+                    ${p.reportSource ? `<small class="proposal-source">Linked Document: <strong>${esc(p.reportSource)}</strong></small>` : ''}
+                  </div>
+
+                  ${warning ? `
+                    <div class="proposal-warning notice warning">
+                      <strong>Notice:</strong> ${esc(warning)}
+                    </div>
+                  ` : ''}
+                </article>
+              `;
+            }).join('')}
+          </div>
+        `}
+
+        <div class="approval-summary-card">
+          <div class="eyebrow">PRE-APPROVAL CHANGE SUMMARY</div>
+          ${selectedProposals.length === 0 ? `
+            <p class="summary-empty">No pending changes selected. Choose one or more eligible proposals above to preview and approve.</p>
+          ` : `
+            <p class="summary-count"><strong>${selectedProposals.length}</strong> change${selectedProposals.length === 1 ? '' : 's'} staged for approval:</p>
+            <ul class="summary-list">
+              ${selectedProposals.map(p => {
+                const fn = p.sourcePath.split('/').pop();
+                const destRel = p.destinationPath.startsWith(currentExecution.workspace)
+                  ? p.destinationPath.slice(currentExecution.workspace.length).replace(/^[\/\\]+/, '')
+                  : p.destinationPath;
+                return `<li><strong>${esc(fn)}</strong> <span class="summary-arrow">→</span> <code>${esc(destRel)}</code> <span class="summary-reason">(${esc(p.reason)})</span></li>`;
+              }).join('')}
+            </ul>
+          `}
+        </div>
+
+        <div class="review-actions">
+          <button id="approve" class="button primary" ${selectedProposals.length === 0 ? 'disabled' : ''}>
+            Approve selected operations (${selectedProposals.length})
+          </button>
+          ${completedCount > 0 ? `
+            <button id="rollback" class="button danger">
+              Rollback completed operations
+            </button>
+          ` : ''}
+        </div>
+      `;
+
+      container.querySelectorAll('.filter-tab').forEach(btn => {
+        btn.onclick = () => {
+          reviewFilter = btn.dataset.filter;
+          renderReview();
+        };
+      });
+
+      const saBtn = $('selectAllBtn');
+      if (saBtn) {
+        saBtn.onclick = () => {
+          eligiblePending.forEach(p => selectedProposalIds.add(p.id));
+          renderReview();
+        };
       }
-      if (hasCompleted) {
-        html += '<button id="rollback" class="button danger">Rollback completed operations</button>';
+
+      const daBtn = $('deselectAllBtn');
+      if (daBtn) {
+        daBtn.onclick = () => {
+          selectedProposalIds.clear();
+          renderReview();
+        };
       }
-      html += '</div>';
-      $('reviewQueue').innerHTML = html;
+
+      container.querySelectorAll('.proposal-select-cb').forEach(cb => {
+        cb.onchange = (e) => {
+          const id = e.target.dataset.id;
+          if (e.target.checked) selectedProposalIds.add(id);
+          else selectedProposalIds.delete(id);
+          renderReview();
+        };
+      });
+
       const approve = $('approve');
       if (approve) approve.onclick = approveSelected;
       const rollback = $('rollback');
@@ -560,14 +968,19 @@
       const btn = $('approve');
       if (btn) { btn.disabled = true; btn.textContent = 'Applying changes…'; }
       try {
-        const ids = [...document.querySelectorAll('#reviewQueue input:checked')].map(x => x.value);
+        const approvedIds = Array.from(selectedProposalIds);
         const data = await api('/api/approve', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ executionId: currentExecution.id, approvedIds: ids })
+          body: JSON.stringify({ executionId: currentExecution.id, approvedIds })
         });
         currentExecution.proposals.forEach(p => {
-          if (data.results.some(r => r.id === p.id && r.status === 'completed')) p.status = 'completed';
+          const match = data.results.find(r => r.id === p.id);
+          if (match) {
+            p.status = match.status;
+            if (match.status === 'failed') p.warning = match.error || 'Operation failed';
+            selectedProposalIds.delete(p.id);
+          }
         });
         renderReview();
         loadHistory();
@@ -586,12 +999,17 @@
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ executionId: currentExecution.id })
         });
+        const rolledBackCount = data.results.filter(r => r.status === 'rolled_back').length;
         currentExecution.proposals.forEach(p => {
-          if (data.results.some(r => r.status === 'rolled_back')) p.status = 'pending';
+          if (p.status === 'completed') {
+            p.status = 'rolled_back';
+          }
         });
         renderReview();
-        const count = data.results.filter(r => r.status === 'rolled_back').length;
-        $('reviewQueue').insertAdjacentHTML('afterbegin', `<div class="notice success">${count} operation(s) successfully rolled back.</div>`);
+        const notice = document.createElement('div');
+        notice.className = 'notice success';
+        notice.textContent = `${rolledBackCount} operation(s) successfully rolled back.`;
+        $('reviewQueue').prepend(notice);
         loadHistory();
       } catch (err) {
         $('reviewQueue').insertAdjacentHTML('afterbegin', `<div class="notice error">${esc(err.message)}</div>`);
@@ -613,6 +1031,7 @@
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ workspace })
         });
+        initSelectedProposals();
         $('scanResult').className = 'result';
         $('scanResult').innerHTML = `
           <div class="result-top">
@@ -693,21 +1112,7 @@
           <button class="button primary" id="openReview">Open Review Center ↘</button>
         `;
         $('openReview').onclick = () => show('review');
-        const csv = currentExecution.reports.find(r => r.category === 'Dataset');
-        if (csv) {
-          $('csvResult').className = 'result';
-          $('csvResult').innerHTML = `
-            <div class="eyebrow">DATASET REPORT</div>
-            <h3 style="font-size: 26px; margin: 0 0 12px;">${esc(csv.source)}</h3>
-            <p style="font-size: 15px; margin-bottom: 20px;">${esc(csv.summary)}</p>
-            <div class="panel" style="background: var(--cream);">
-              <div class="eyebrow">DETECTED COLUMNS</div>
-              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                ${csv.facts.map(f => `<span class="report-tag" style="background: var(--surface-white);">${esc(f)}</span>`).join('')}
-              </div>
-            </div>
-          `;
-        }
+        renderCsvLab();
         loadHistory();
         loadAiStatus();
       } catch (err) {
@@ -717,6 +1122,194 @@
         $('run').textContent = 'Run dry-run scan';
       }
     };
+    function renderCsvLab() {
+      const csvContainer = $('csvResult');
+      if (!csvContainer) return;
+      if (!currentExecution) {
+        csvContainer.className = 'result empty';
+        csvContainer.innerHTML = `
+          <div class="empty-icon">✦</div>
+          <h3>No dataset profiled.</h3>
+          <p>Run a workspace scan or execute a CSV Data Quality Audit recipe to inspect row counts, duplicate rows, and schema metrics.</p>
+          <button class="button primary" onclick="show('studio')">Open Automation Recipes ↘</button>
+        `;
+        return;
+      }
+      const csv = currentExecution.reports.find(r => r.category === 'Dataset');
+      if (csv) {
+        csvContainer.className = 'result';
+        csvContainer.innerHTML = `
+          <div class="eyebrow">DATASET REPORT</div>
+          <h3 style="font-size: 26px; margin: 0 0 12px;">${esc(csv.source)}</h3>
+          <p style="font-size: 15px; margin-bottom: 20px;">${esc(csv.summary)}</p>
+          <div class="panel" style="background: var(--cream);">
+            <div class="eyebrow">DETECTED COLUMNS</div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              ${csv.facts.map(f => `<span class="report-tag" style="background: var(--surface-white);">${esc(f)}</span>`).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        csvContainer.className = 'result empty';
+        csvContainer.innerHTML = `
+          <div class="empty-icon">✦</div>
+          <h3>No CSV file in latest execution.</h3>
+          <p>The latest execution scanned ${currentExecution.filesProcessed} file(s), but did not identify any CSV datasets.</p>
+          <button class="button primary" onclick="show('studio')">Run CSV Audit Recipe ↘</button>
+        `;
+      }
+    }
+    async function loadRecipes() {
+      try {
+        availableRecipes = await api('/api/recipes');
+        renderRecipeCards();
+      } catch (err) {
+        const rc = $('recipeCards');
+        if (rc) rc.innerHTML = `<div class="notice error">Failed to load recipes: ${esc(err.message)}</div>`;
+      }
+    }
+    function renderRecipeCards() {
+      const container = $('recipeCards');
+      if (!container) return;
+      if (!availableRecipes.length) {
+        container.innerHTML = '<div class="notice">No automation recipes available.</div>';
+        return;
+      }
+      container.innerHTML = availableRecipes.map((r, i) => `
+        <article class="panel recipe-card" id="recipe-card-${esc(r.id)}">
+          <div class="recipe-card-header">
+            <span class="card-number">0${i + 1}</span>
+            <span class="recipe-target-badge">${r.targetView === 'csv' ? 'CSV LAB' : 'REVIEW CENTER'}</span>
+          </div>
+          <h3>${esc(r.name)}</h3>
+          <p class="recipe-tagline">${esc(r.tagline)}</p>
+          <p class="recipe-desc">${esc(r.description)}</p>
+          <div class="recipe-reqs">
+            <span class="recipe-subheading">INPUT REQUIREMENTS</span>
+            <p>${esc(r.inputRequirements)}</p>
+          </div>
+          <div class="recipe-ops">
+            <span class="recipe-subheading">OPERATIONS PREVIEW</span>
+            <ul>
+              ${r.operationsPreview.map(op => `<li>${esc(op)}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="recipe-action">
+            <button class="button primary recipe-run-btn" data-recipe="${esc(r.id)}" onclick="triggerRecipe('${esc(r.id)}')">Run Recipe (Dry Run) ↘</button>
+          </div>
+        </article>
+      `).join('');
+    }
+    async function triggerRecipe(recipeId) {
+      if (isRecipeRunning) return;
+      const workspaceInput = $('recipeWorkspace');
+      let workspace = workspaceInput ? workspaceInput.value.trim() : '';
+      if (!workspace) {
+        const mainWs = $('workspacePath');
+        if (mainWs && mainWs.value.trim()) {
+          workspace = mainWs.value.trim();
+          if (workspaceInput) workspaceInput.value = workspace;
+        }
+      }
+      if (!workspace) {
+        $('recipeRunResult').className = 'result';
+        $('recipeRunResult').innerHTML = '<div class="notice error">Enter an authorized workspace path before running a recipe.</div>';
+        $('recipeRunResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      }
+      isRecipeRunning = true;
+      const allBtns = document.querySelectorAll('.recipe-run-btn');
+      allBtns.forEach(b => {
+        b.disabled = true;
+        if (b.dataset.recipe === recipeId) {
+          b.textContent = 'Running dry-run…';
+        }
+      });
+      const statusBadge = $('recipesStatus');
+      if (statusBadge) statusBadge.textContent = 'Executing dry-run…';
+
+      try {
+        const result = await api('/api/recipes/run', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ recipeId, workspace })
+        });
+        currentExecution = result.execution;
+        initSelectedProposals();
+        renderReview();
+        renderCsvLab();
+        const targetActionText = result.targetView === 'csv'
+          ? 'Open CSV Lab ↘'
+          : `Inspect & Approve in Review Center (${result.execution.proposals.length} proposals) ↘`;
+        const targetActionFn = result.targetView === 'csv'
+          ? "show('csv')"
+          : "show('review')";
+
+        $('recipeRunResult').className = 'result';
+        $('recipeRunResult').innerHTML = `
+          <div class="result-top">
+            <div>
+              <div class="eyebrow">${esc(result.recipeName.toUpperCase())} · DRY RUN</div>
+              <h3>${esc(result.summary.headline)}</h3>
+              <p style="font-size: 14px; margin: 4px 0 0; color: var(--ink-muted);">Workspace: <code>${esc(result.workspace)}</code> · Execution: <code>${esc(result.execution.id.slice(0, 8))}</code></p>
+            </div>
+            <div class="saved-pill">
+              ~${result.execution.estimatedNetMinutesSaved.toFixed(1)} min
+              <small>estimated net saved</small>
+            </div>
+          </div>
+          <div class="metrics">
+            ${result.summary.metrics.map(m => metric(m.label, m.value)).join('')}
+          </div>
+          ${result.summary.highlights && result.summary.highlights.length ? `
+            <div class="panel" style="background: var(--cream); margin: 20px 0;">
+              <div class="eyebrow">RECIPE HIGHLIGHTS</div>
+              <ul class="recipe-highlights-list" style="margin: 8px 0 0; padding-left: 20px; line-height: 1.6;">
+                ${result.summary.highlights.map(h => `<li>${esc(h)}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+          <div class="recipe-nav-actions" style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px;">
+            <button class="button primary" onclick="${targetActionFn}">${targetActionText}</button>
+            <button class="button" onclick="show('workspace')">View Full Workspace Inventory ↘</button>
+          </div>
+        `;
+        $('recipeRunResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (statusBadge) statusBadge.textContent = 'Dry-run completed';
+        loadHistory();
+        loadAiStatus();
+      } catch (err) {
+        $('recipeRunResult').className = 'result';
+        $('recipeRunResult').innerHTML = `<div class="notice error">Recipe execution failed: ${esc(err.message)}</div>`;
+        if (statusBadge) statusBadge.textContent = 'Execution failed';
+      } finally {
+        isRecipeRunning = false;
+        allBtns.forEach(b => {
+          b.disabled = false;
+          b.textContent = 'Run Recipe (Dry Run) ↘';
+        });
+        setTimeout(() => {
+          if (statusBadge && statusBadge.textContent === 'Dry-run completed') {
+            statusBadge.textContent = '4 recipes ready';
+          }
+        }, 4000);
+      }
+    }
+    const syncWsBtn = $('syncWorkspaceBtn');
+    if (syncWsBtn) {
+      syncWsBtn.onclick = () => {
+        const mainWs = $('workspacePath');
+        if (mainWs && mainWs.value.trim()) {
+          $('recipeWorkspace').value = mainWs.value.trim();
+        }
+      };
+    }
+    const presetRecipeDemo = $('presetRecipeDemo');
+    if (presetRecipeDemo) {
+      presetRecipeDemo.onclick = () => {
+        $('recipeWorkspace').value = 'demo-workspace';
+      };
+    }
     $('refreshHealth').onclick = () => loadAiStatus(true);
     const recheckBtn = $('recheckAiBtn');
     if (recheckBtn) recheckBtn.onclick = () => loadAiStatus(true);
@@ -741,6 +1334,7 @@
     });
     health();
     loadHistory();
+    loadRecipes();
     if (location.hash) show(location.hash.slice(1));
   </script>
 </body>
