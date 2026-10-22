@@ -5,6 +5,8 @@ import { strict as assert } from "node:assert";
 import { test, before, after } from "node:test";
 import {
   computeExecutionMetrics,
+  resolveExecutionStatus,
+  sanitizeErrorMessage,
   sanitizePath,
   serializeExecutionToJson,
   serializeExecutionToMarkdown
@@ -423,4 +425,137 @@ test("server API: GET /api/executions/:id/export exports Markdown and JSON with 
 
   const missingRes = await fetch(`${baseUrl}/api/executions/fake-id-1234/export`);
   assert.equal(missingRes.status, 404);
+});
+
+test("resolveExecutionStatus resolves status accurately across execution lifecycles", () => {
+  const completedExec: Execution = {
+    id: "exec-status-1",
+    workspace: "/test",
+    filesProcessed: 1,
+    duplicates: 0,
+    tasksExtracted: 0,
+    manualMinutes: 6,
+    automatedMinutes: 0.1,
+    reviewMinutes: 0.5,
+    estimatedNetMinutesSaved: 5.4,
+    startedAt: "2026-10-22T00:00:00.000Z",
+    endedAt: "2026-10-22T00:00:01.000Z",
+    status: "completed",
+    proposals: [
+      {
+        id: "p1",
+        sourcePath: "/test/file.txt",
+        destinationPath: "/test/Docs/file.txt",
+        reason: "Organize",
+        status: "completed"
+      }
+    ],
+    reports: [],
+    errors: []
+  };
+  assert.equal(resolveExecutionStatus(completedExec), "completed");
+
+  const rolledBackExec: Execution = {
+    ...completedExec,
+    status: "completed",
+    proposals: [
+      {
+        id: "p1",
+        sourcePath: "/test/file.txt",
+        destinationPath: "/test/Docs/file.txt",
+        reason: "Organize",
+        status: "rolled_back"
+      }
+    ]
+  };
+  assert.equal(resolveExecutionStatus(rolledBackExec), "rolled_back");
+
+  const failedExec: Execution = {
+    ...completedExec,
+    status: "failed",
+    errors: ["Fatal workspace error"]
+  };
+  assert.equal(resolveExecutionStatus(failedExec), "failed");
+
+  const inferredFailed: Execution = {
+    id: "inferred-fail",
+    workspace: "/test",
+    filesProcessed: 0,
+    duplicates: 0,
+    tasksExtracted: 0,
+    manualMinutes: 0,
+    automatedMinutes: 0,
+    reviewMinutes: 0,
+    estimatedNetMinutesSaved: 0,
+    startedAt: "",
+    endedAt: "",
+    status: "completed",
+    proposals: [],
+    reports: [],
+    errors: ["EACCES: permission denied"]
+  };
+  assert.equal(resolveExecutionStatus(inferredFailed), "failed");
+});
+
+test("sanitizeErrorMessage redacts secrets and stack traces unconditionally", () => {
+  const rawError = "Error: fail\n    at Object.run (/Users/secretdev/app.ts:42:15)\n    at Module.load (node:internal:1:1)\nwith token=ghp_ABC12345678901234567890 and key: sk-live99999999999999999999";
+  const sanitized = sanitizeErrorMessage(rawError, "/Users/secretdev/project");
+  assert.ok(!sanitized.includes("/Users/secretdev"));
+  assert.ok(!sanitized.includes("42:15"));
+  assert.ok(!sanitized.includes("ghp_ABC"));
+  assert.ok(!sanitized.includes("sk-live"));
+  assert.ok(sanitized.includes("[REDACTED"));
+  assert.ok(sanitized.includes("[internal-trace]"));
+
+  const unmaskedWs = sanitizeErrorMessage(rawError);
+  assert.ok(!unmaskedWs.includes("ghp_ABC"));
+  assert.ok(!unmaskedWs.includes("sk-live"));
+  assert.ok(!unmaskedWs.includes("42:15"));
+});
+
+test("serialization handles missing and malformed fields gracefully", () => {
+  const brokenRecord: any = {
+    id: null,
+    status: undefined,
+    workspace: undefined,
+    startedAt: undefined,
+    endedAt: "invalid-date",
+    filesProcessed: "not-a-number",
+    duplicates: null,
+    proposals: [
+      {
+        id: "p-broken",
+        sourcePath: null,
+        destinationPath: undefined,
+        reason: null,
+        status: "unknown_status"
+      }
+    ],
+    reports: [
+      {
+        source: null,
+        tasks: null,
+        decisions: undefined,
+        deadlines: null
+      }
+    ],
+    errors: [null, undefined, "Simple error"]
+  };
+
+  const jsonStr = serializeExecutionToJson(brokenRecord);
+  const parsed = JSON.parse(jsonStr);
+  assert.equal(parsed.executionId, "unknown");
+  assert.equal(parsed.status, "completed");
+  assert.equal(parsed.timing.measuredDurationSeconds, 0);
+  assert.equal(parsed.inventory.filesProcessed, 0);
+  assert.equal(parsed.inventory.duplicatesDetected, 0);
+  assert.equal(parsed.operations.completed, 0);
+  assert.equal(parsed.proposals[0].id, "p-broken");
+  assert.equal(parsed.reports[0].tasksCount, 0);
+
+  const mdStr = serializeExecutionToMarkdown(brokenRecord);
+  assert.ok(mdStr.includes("- **Execution ID:** `unknown`"));
+  assert.ok(mdStr.includes("COMPLETED"));
+  assert.ok(mdStr.includes("0.000s"));
+  assert.ok(mdStr.includes("Simple error"));
 });

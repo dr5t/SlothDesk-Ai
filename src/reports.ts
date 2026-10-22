@@ -39,6 +39,12 @@ export function resolveExecutionStatus(execution: Execution): "completed" | "fai
   return execution.status || "completed";
 }
 
+export function formatDateSafe(val?: string): string {
+  if (!val || typeof val !== "string") return "N/A";
+  const d = new Date(val);
+  return isNaN(d.getTime()) ? "N/A" : d.toISOString();
+}
+
 export function computeExecutionMetrics(
   execution: Execution,
   journal: OperationJournalEntry[] = []
@@ -46,7 +52,7 @@ export function computeExecutionMetrics(
   const executionId = execution.id || "unknown";
   const proposals = Array.isArray(execution.proposals) ? execution.proposals : [];
   const reports = Array.isArray(execution.reports) ? execution.reports : [];
-  const errors = Array.isArray(execution.errors) ? execution.errors : [];
+  const errors = Array.isArray(execution.errors) ? execution.errors.filter((e): e is string => typeof e === "string") : [];
 
   let durationSeconds = 0;
   if (execution.startedAt && execution.endedAt) {
@@ -60,15 +66,15 @@ export function computeExecutionMetrics(
     durationSeconds = execution.automatedMinutes * 60;
   }
 
-  const completed = proposals.filter((p) => p.status === "completed").length;
-  const failed = proposals.filter((p) => p.status === "failed").length;
-  const rolledBack = proposals.filter((p) => p.status === "rolled_back").length;
-  const pending = proposals.filter((p) => p.status === "pending").length;
+  const completed = proposals.filter((p) => p && p.status === "completed").length;
+  const failed = proposals.filter((p) => p && p.status === "failed").length;
+  const rolledBack = proposals.filter((p) => p && p.status === "rolled_back").length;
+  const pending = proposals.filter((p) => p && p.status === "pending").length;
 
   const status = resolveExecutionStatus(execution);
 
-  const hasOllama = reports.some((r) => r.provider === "ollama");
-  const hasDet = reports.some((r) => r.provider === "deterministic");
+  const hasOllama = reports.some((r) => r && r.provider === "ollama");
+  const hasDet = reports.some((r) => r && r.provider === "deterministic");
   const providerType: "ollama" | "deterministic" | "mixed" =
     hasOllama && hasDet ? "mixed" : hasOllama ? "ollama" : "deterministic";
 
@@ -87,8 +93,8 @@ export function computeExecutionMetrics(
   return {
     executionId,
     status,
-    startedAt: execution.startedAt || "",
-    endedAt: execution.endedAt || "",
+    startedAt: formatDateSafe(execution.startedAt) === "N/A" ? "" : execution.startedAt,
+    endedAt: formatDateSafe(execution.endedAt) === "N/A" ? "" : execution.endedAt,
     durationSeconds,
     filesProcessed: Number(execution.filesProcessed) || 0,
     duplicates: Number(execution.duplicates) || 0,
@@ -151,15 +157,15 @@ export function serializeExecutionToJson(
   const metrics = computeExecutionMetrics(execution, options.journal);
   const proposals = Array.isArray(execution.proposals) ? execution.proposals : [];
   const reports = Array.isArray(execution.reports) ? execution.reports : [];
-  const errors = Array.isArray(execution.errors) ? execution.errors : [];
+  const errors = Array.isArray(execution.errors) ? execution.errors.filter((e): e is string => typeof e === "string") : [];
 
   const payload = {
     executionId: metrics.executionId,
     status: metrics.status,
     workspace: shouldSanitize ? "[authorized-workspace]" : execution.workspace || "",
     timing: {
-      startedAt: execution.startedAt || "",
-      endedAt: execution.endedAt || "",
+      startedAt: formatDateSafe(execution.startedAt) === "N/A" ? "" : execution.startedAt,
+      endedAt: formatDateSafe(execution.endedAt) === "N/A" ? "" : execution.endedAt,
       measuredDurationSeconds: Number(metrics.durationSeconds.toFixed(3))
     },
     inventory: {
@@ -185,23 +191,23 @@ export function serializeExecutionToJson(
     },
     errors: errors.map((err) => sanitizeErrorMessage(err, shouldSanitize ? execution.workspace : undefined)),
     proposals: proposals.map((p) => ({
-      id: p.id,
-      source: shouldSanitize ? sanitizePath(p.sourcePath, execution.workspace) : p.sourcePath,
-      destination: shouldSanitize ? sanitizePath(p.destinationPath, execution.workspace) : p.destinationPath,
-      operationType: p.operationType || (p.sourcePath === p.destinationPath ? "duplicate_review" : "categorize_move"),
-      status: p.status,
-      reason: p.reason,
-      provider: p.provider || "deterministic",
-      warning: p.warning ? sanitizeErrorMessage(p.warning, shouldSanitize ? execution.workspace : undefined) : undefined
+      id: p?.id || "",
+      source: shouldSanitize ? sanitizePath(p?.sourcePath, execution.workspace) : p?.sourcePath || "",
+      destination: shouldSanitize ? sanitizePath(p?.destinationPath, execution.workspace) : p?.destinationPath || "",
+      operationType: p?.operationType || (p?.sourcePath === p?.destinationPath ? "duplicate_review" : "categorize_move"),
+      status: p?.status || "pending",
+      reason: p?.reason || "",
+      provider: p?.provider || "deterministic",
+      warning: p?.warning ? sanitizeErrorMessage(p.warning, shouldSanitize ? execution.workspace : undefined) : undefined
     })),
     reports: reports.map((r) => ({
-      source: shouldSanitize ? sanitizePath(r.source, execution.workspace) : r.source,
-      category: r.category,
-      summary: r.summary,
-      tasksCount: Array.isArray(r.tasks) ? r.tasks.length : 0,
-      decisionsCount: Array.isArray(r.decisions) ? r.decisions.length : 0,
-      deadlinesCount: Array.isArray(r.deadlines) ? r.deadlines.length : 0,
-      provider: r.provider
+      source: shouldSanitize ? sanitizePath(r?.source, execution.workspace) : r?.source || "",
+      category: r?.category || "General",
+      summary: r?.summary || "",
+      tasksCount: Array.isArray(r?.tasks) ? r.tasks.length : 0,
+      decisionsCount: Array.isArray(r?.decisions) ? r.decisions.length : 0,
+      deadlinesCount: Array.isArray(r?.deadlines) ? r.deadlines.length : 0,
+      provider: r?.provider || "deterministic"
     }))
   };
 
@@ -216,7 +222,7 @@ export function serializeExecutionToMarkdown(
   const metrics = computeExecutionMetrics(execution, options.journal);
   const proposals = Array.isArray(execution.proposals) ? execution.proposals : [];
   const reports = Array.isArray(execution.reports) ? execution.reports : [];
-  const errors = Array.isArray(execution.errors) ? execution.errors : [];
+  const errors = Array.isArray(execution.errors) ? execution.errors.filter((e): e is string => typeof e === "string") : [];
 
   const lines: string[] = [
     `# SlothDesk AI Execution Report`,
@@ -225,8 +231,8 @@ export function serializeExecutionToMarkdown(
     `- **Execution ID:** \`${metrics.executionId}\``,
     `- **Execution Status:** ${metrics.status.toUpperCase()}`,
     `- **Workspace:** \`${shouldSanitize ? "[authorized-workspace]" : execution.workspace || ""}\``,
-    `- **Start Time:** ${execution.startedAt ? new Date(execution.startedAt).toISOString() : "N/A"}`,
-    `- **End Time:** ${execution.endedAt ? new Date(execution.endedAt).toISOString() : "N/A"}`,
+    `- **Start Time:** ${formatDateSafe(execution.startedAt)}`,
+    `- **End Time:** ${formatDateSafe(execution.endedAt)}`,
     `- **Measured Automation Duration:** ${metrics.durationSeconds.toFixed(3)}s`,
     `- **Analysis Provider:** ${metrics.providerName}`,
     ``,

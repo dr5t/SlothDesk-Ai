@@ -153,6 +153,7 @@ export async function approveOperations(execution: Execution, approvedIds: strin
       await fs.rename(source, destination);
 
       item.status = "completed";
+      stored.status = "completed";
       const journalEntry: OperationJournalEntry = {
         id: crypto.randomUUID(),
         proposalId: item.id,
@@ -222,6 +223,10 @@ export async function rollbackExecution(executionId: string) {
       const proposal = execution.proposals.find((item) => item.id === entry.proposalId);
       if (proposal) {
         proposal.status = "rolled_back";
+        const hasCompletedLeft = execution.proposals.some((p) => p.status === "completed");
+        if (!hasCompletedLeft && execution.proposals.some((p) => p.status === "rolled_back")) {
+          execution.status = "rolled_back";
+        }
         await saveExecution(execution);
       }
 

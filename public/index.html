@@ -509,7 +509,10 @@
         } else {
           $('recent').innerHTML = data.slice(0, 3).map(x => `
             <article class="card-item">
-              <span class="eyebrow">${esc(x.id.slice(0, 8))} · ${esc(x.status)}</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span class="eyebrow">${esc(x.id.slice(0, 8))} · ${esc(x.status)}</span>
+                <button class="button small" style="padding: 2px 8px; font-size: 11px;" onclick="show('activity'); inspectExecution('${esc(x.id)}')">Inspect ↘</button>
+              </div>
               <h3>${x.filesProcessed} files · ${x.tasksExtracted} tasks</h3>
               <p>${new Date(x.startedAt).toLocaleString()}</p>
             </article>
@@ -560,6 +563,15 @@
                   <div class="stat-cell"><span class="stat-label">Failed</span><span class="stat-val text-danger">${failed}</span></div>
                   <div class="stat-cell"><span class="stat-label">Rolled Back</span><span class="stat-val text-warning">${rolledBack}</span></div>
                 </div>
+                ${errors.length > 0 ? `
+                  <div class="card-errors-summary" style="margin: 12px 0 0; padding: 8px 12px; background: #fff5f5; border: 1px solid #fca5a5; font-size: 11px; font-family: monospace; color: #991b1b;">
+                    <strong>Error Summaries:</strong>
+                    <ul style="margin: 4px 0 0 16px; padding: 0;">
+                      ${errors.slice(0, 3).map(err => `<li>${esc(err.replace(/at\s+.*\(.*:\d+:\d+\)/g, '[internal-trace]'))}</li>`).join('')}
+                      ${errors.length > 3 ? `<li>+${errors.length - 3} more error(s) — inspect for full diagnostics</li>` : ''}
+                    </ul>
+                  </div>
+                ` : ''}
                 <div class="execution-card-footer">
                   <div class="time-saved-badge">
                     <span>Est. Net Saved: <b>~${(Number(x.estimatedNetMinutesSaved) || 0).toFixed(1)}m</b> (heuristic model)</span>
@@ -578,6 +590,15 @@
         $('dashboardStatus').textContent = 'Unable to load history';
       }
     }
+    function formatPath(rawPath, workspace, sanitize) {
+      if (!rawPath || typeof rawPath !== 'string') return '';
+      if (!sanitize) return rawPath;
+      if (workspace && rawPath.startsWith(workspace)) {
+        const rel = rawPath.slice(workspace.length).replace(/^[/\\]+/, '');
+        return rel || rawPath.split(/[/\\]+/).pop();
+      }
+      return rawPath.split(/[/\\]+/).slice(-2).join('/');
+    }
     async function inspectExecution(id) {
       const container = $('inspectorContainer');
       if (!container) return;
@@ -593,14 +614,51 @@
         const reports = Array.isArray(ex.reports) ? ex.reports : [];
         const errors = Array.isArray(ex.errors) ? ex.errors : [];
 
+        function renderProposalsTable(sanitize) {
+          if (proposals.length === 0) return '<p class="empty-sub">No staged proposals in this execution record.</p>';
+          return `
+            <div class="inspector-table-wrapper">
+              <table class="inspector-table">
+                <thead>
+                  <tr>
+                    <th>Source</th>
+                    <th>Destination</th>
+                    <th>Operation</th>
+                    <th>Status</th>
+                    <th>Provider</th>
+                    <th>Reason</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${proposals.map(p => {
+                    const src = sanitize ? formatPath(p.sourcePath, ex.workspace, true) : p.sourcePath;
+                    const dest = sanitize ? formatPath(p.destinationPath, ex.workspace, true) : p.destinationPath;
+                    const op = p.operationType || (p.sourcePath === p.destinationPath ? 'duplicate_review' : 'categorize_move');
+                    return `
+                      <tr>
+                        <td class="mono-cell">${esc(src)}</td>
+                        <td class="mono-cell">${esc(dest)}</td>
+                        <td><span class="op-tag">${esc(op)}</span></td>
+                        <td><span class="status-pill status-${esc(p.status)}">${esc((p.status || 'pending').toUpperCase().replace('_', ' '))}</span></td>
+                        <td><span class="provider-pill">${esc(p.provider || 'deterministic')}</span></td>
+                        <td>${esc(p.reason || '')}${p.warning ? `<span class="warning-tag">⚠️ ${esc(p.warning)}</span>` : ''}</td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          `;
+        }
+
         container.innerHTML = `
           <article class="inspector-card">
             <div class="inspector-header">
               <div>
                 <div class="eyebrow">EXECUTION INSPECTOR</div>
                 <h3 class="inspector-title">
-                  <span class="mono-badge big">${esc(ex.id)}</span>
-                  <span class="status-pill status-${esc(ex.status)}">${esc(ex.status.toUpperCase().replace('_', ' '))}</span>
+                  <span class="mono-badge big">${esc(m.executionId)}</span>
+                  <span class="status-pill status-${esc(m.status)}">${esc(m.status.toUpperCase().replace('_', ' '))}</span>
                 </h3>
               </div>
               <button class="button small" onclick="closeInspector()">✕ Close Inspector</button>
@@ -614,37 +672,47 @@
                 </label>
               </div>
               <div class="export-btn-group">
-                <button class="button primary small" onclick="downloadExecutionReport('${esc(ex.id)}', 'markdown', $('inspectorSanitize').checked)">Export Markdown (.md) ⤓</button>
-                <button class="button small" onclick="downloadExecutionReport('${esc(ex.id)}', 'json', $('inspectorSanitize').checked)">Export JSON (.json) ⤓</button>
+                <button class="button primary small" id="btnExportMd">Export Markdown (.md) ⤓</button>
+                <button class="button small" id="btnExportJson">Export JSON (.json) ⤓</button>
                 <button class="button small" onclick="loadExecutionIntoReview('${esc(ex.id)}')">Open in Review Center ↘</button>
               </div>
             </div>
 
             <div class="inspector-metrics-grid">
               <div class="metric-box">
+                <span class="label">Start Time</span>
+                <span class="val" style="font-size: 14px;">${m.startedAt ? new Date(m.startedAt).toLocaleString() : 'N/A'}</span>
+                <span class="sub">Verified start timestamp</span>
+              </div>
+              <div class="metric-box">
                 <span class="label">Measured Runtime</span>
                 <span class="val">${m.durationSeconds.toFixed(3)}s</span>
                 <span class="sub">Verified automated clock duration</span>
               </div>
               <div class="metric-box">
-                <span class="label">Estimated Net Time Saved</span>
-                <span class="val">~${m.estimatedNetMinutesSaved.toFixed(1)} min</span>
-                <span class="sub">Projected human time saving estimate</span>
-              </div>
-              <div class="metric-box">
                 <span class="label">Files & Duplicates</span>
                 <span class="val">${m.filesProcessed} / ${m.duplicates}</span>
-                <span class="sub">Files scanned / duplicates found</span>
+                <span class="sub">${m.filesProcessed} processed · ${m.duplicates} duplicates</span>
+              </div>
+              <div class="metric-box">
+                <span class="label">Proposals Staged</span>
+                <span class="val">${m.proposalsTotal}</span>
+                <span class="sub">Total candidate operations</span>
               </div>
               <div class="metric-box">
                 <span class="label">Operations Breakdown</span>
                 <span class="val">${m.completed} ok · ${m.failed} err · ${m.rolledBack} rb</span>
                 <span class="sub">${m.pending} pending of ${m.proposalsTotal} total</span>
               </div>
-              <div class="metric-box" style="grid-column: span 2;">
+              <div class="metric-box">
+                <span class="label">Estimated Net Time Saved</span>
+                <span class="val">~${m.estimatedNetMinutesSaved.toFixed(1)} min</span>
+                <span class="sub">Projected human time saving estimate</span>
+              </div>
+              <div class="metric-box" style="grid-column: 1 / -1;">
                 <span class="label">Processing Provider</span>
                 <span class="val" style="font-size: 16px;">${esc(m.providerName)}</span>
-                <span class="sub">Execution engine used for document intelligence</span>
+                <span class="sub">Engine mode: ${esc(m.providerType.toUpperCase())}</span>
               </div>
             </div>
 
@@ -655,7 +723,7 @@
 
             ${errors.length > 0 ? `
               <div class="inspector-errors">
-                <h4>Errors & Diagnostics (${errors.length})</h4>
+                <h4>Error Summaries & Diagnostics (${errors.length})</h4>
                 <div class="error-list">
                   ${errors.map(err => `<div class="error-item">⚠️ ${esc(err)}</div>`).join('')}
                 </div>
@@ -664,34 +732,7 @@
 
             <div class="inspector-proposals-section">
               <h4>Staged Proposals & Operations (${proposals.length})</h4>
-              ${proposals.length === 0 ? '<p class="empty-sub">No staged proposals in this execution record.</p>' : `
-                <div class="inspector-table-wrapper">
-                  <table class="inspector-table">
-                    <thead>
-                      <tr>
-                        <th>Source</th>
-                        <th>Destination</th>
-                        <th>Operation</th>
-                        <th>Status</th>
-                        <th>Provider</th>
-                        <th>Reason</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      ${proposals.map(p => `
-                        <tr>
-                          <td class="mono-cell">${esc(p.sourcePath)}</td>
-                          <td class="mono-cell">${esc(p.destinationPath)}</td>
-                          <td><span class="op-tag">${esc(p.operationType || (p.sourcePath === p.destinationPath ? 'duplicate_review' : 'categorize_move'))}</span></td>
-                          <td><span class="status-pill status-${esc(p.status)}">${esc((p.status || 'pending').toUpperCase().replace('_', ' '))}</span></td>
-                          <td><span class="provider-pill">${esc(p.provider || 'deterministic')}</span></td>
-                          <td>${esc(p.reason || '')}${p.warning ? `<span class="warning-tag">⚠️ ${esc(p.warning)}</span>` : ''}</td>
-                        </tr>
-                      `).join('')}
-                    </tbody>
-                  </table>
-                </div>
-              `}
+              <div id="inspectorProposalsTable">${renderProposalsTable(true)}</div>
             </div>
 
             ${reports.length > 0 ? `
@@ -701,7 +742,7 @@
                   ${reports.map(r => `
                     <div class="inspector-report-item">
                       <div class="report-head">
-                        <span class="mono-badge">${esc(r.source)}</span>
+                        <span class="mono-badge">${esc(formatPath(r.source, ex.workspace, true))}</span>
                         <span class="provider-pill">${esc(r.provider)}</span>
                       </div>
                       <p><strong>Category:</strong> ${esc(r.category)}</p>
@@ -718,6 +759,23 @@
             ` : ''}
           </article>
         `;
+
+        const sanitizeCheckbox = $('inspectorSanitize');
+        if (sanitizeCheckbox) {
+          sanitizeCheckbox.onchange = () => {
+            const isSanitized = sanitizeCheckbox.checked;
+            const tableContainer = $('inspectorProposalsTable');
+            if (tableContainer) tableContainer.innerHTML = renderProposalsTable(isSanitized);
+          };
+        }
+        const btnExportMd = $('btnExportMd');
+        if (btnExportMd) {
+          btnExportMd.onclick = () => downloadExecutionReport(ex.id, 'markdown', $('inspectorSanitize').checked);
+        }
+        const btnExportJson = $('btnExportJson');
+        if (btnExportJson) {
+          btnExportJson.onclick = () => downloadExecutionReport(ex.id, 'json', $('inspectorSanitize').checked);
+        }
       } catch (err) {
         container.innerHTML = `<div class="notice" style="color: var(--danger)">Unable to inspect execution: ${esc(err.message || String(err))}</div>`;
       }
