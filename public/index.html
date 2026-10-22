@@ -13,7 +13,7 @@
     <header class="topbar">
       <a class="brand" href="#dashboard" id="brandLink" aria-label="SlothDesk AI Home">
         <img src="/logo.svg" alt="SlothDesk AI Logo" class="brand-logo" width="32" height="32">
-        <span>SLOTHDESK <em>AI</em></span>
+        <span class="brand-text">SLOTHDESK <em>AI</em></span>
       </a>
       <div class="topbar-right">
         <div class="mode" id="modeContainer">
@@ -34,25 +34,24 @@
       <button class="tab" data-view="studio">Automation Studio</button>
       <button class="tab" data-view="review">Review Center</button>
       <button class="tab" data-view="csv">CSV Lab</button>
-      <button class="tab" data-view="ai">AI Control Center</button>
       <button class="tab" data-view="activity">Activity & Settings</button>
     </div>
   </nav>
+  <div id="menuBackdrop" class="menu-backdrop" aria-hidden="true"></div>
   <main>
     <section id="dashboard" class="view active">
       <div class="hero">
         <div class="eyebrow">00 / PRODUCTIVITY AUTOMATION WORKBENCH</div>
         <h1>Let the busywork<br><span>move slower.</span></h1>
-        <p class="lede">Turn scattered notes and datasets into a reviewable action plan, with local open-weight AI when Ollama is available.</p>
+        <p class="lede">Turn scattered notes and datasets into an inspectable, reviewable action plan using local open-weight AI with deterministic safety.</p>
         <div class="hero-actions">
           <button class="button primary" data-go="workspace">Open workspace ↘</button>
-          <button class="button" data-go="studio">Explore studio</button>
-          <button class="button" data-go="ai">AI Control Center</button>
+          <button class="button" data-go="studio">Explore automation recipes</button>
         </div>
       </div>
       <div class="section-head">
         <div>
-          <div class="eyebrow">LIVE, NOT DECORATIVE</div>
+          <div class="eyebrow">VERIFIED RUNTIME ACTIVITY</div>
           <h2>Your desk today</h2>
         </div>
         <span id="dashboardStatus" class="status">Loading history…</span>
@@ -100,7 +99,63 @@
         <small>Target folder for recipe dry runs. Preset shortcut: <span class="preset-chip" id="presetRecipeDemo">demo-workspace</span>. File operations always require explicit approval.</small>
       </div>
       <div id="recipeCards" class="recipes-grid"></div>
-      <div class="section-head" style="margin-top: 40px;">
+      <div class="section-head" style="margin-top: 36px;">
+        <div>
+          <div class="eyebrow">ROADMAP · COMING IN V0.2</div>
+          <h3>Planned Automation Recipes</h3>
+        </div>
+      </div>
+      <div class="recipes-grid" style="margin-bottom: 36px;">
+        <article class="panel recipe-card" style="opacity: 0.85;">
+          <div class="recipe-card-header">
+            <span class="card-number">05</span>
+            <span class="recipe-target-badge" style="background: var(--surface-hover); color: var(--ink-muted);">PLANNED FOR V0.2</span>
+          </div>
+          <h3>Git Commit History Auditor</h3>
+          <p class="recipe-tagline">Extract release notes, key decisions, and unfinished tasks.</p>
+          <p class="recipe-desc">Inspects recent git commit logs locally to extract structured changelogs, breaking change notices, and developer decisions.</p>
+          <div class="recipe-reqs">
+            <span class="recipe-subheading">INPUT REQUIREMENTS</span>
+            <p>Authorized Git repository root containing a .git folder.</p>
+          </div>
+          <div class="recipe-ops">
+            <span class="recipe-subheading">OPERATIONS PREVIEW</span>
+            <ul>
+              <li>Parse commit messages with deterministic regex</li>
+              <li>Extract decision logs with local Gemma 3 model</li>
+              <li>Stage release note proposal in Review Center</li>
+            </ul>
+          </div>
+          <div class="recipe-action">
+            <button class="button" disabled style="width: 100%;">Feature in Development · v0.2</button>
+          </div>
+        </article>
+        <article class="panel recipe-card" style="opacity: 0.85;">
+          <div class="recipe-card-header">
+            <span class="card-number">06</span>
+            <span class="recipe-target-badge" style="background: var(--surface-hover); color: var(--ink-muted);">PLANNED FOR V0.2</span>
+          </div>
+          <h3>Document OCR & Receipt Triage</h3>
+          <p class="recipe-tagline">Convert scanned PDF documents and receipts into structured metadata.</p>
+          <p class="recipe-desc">Parses local scanned PDF documents and image receipts on-device using open-weight vision pipelines without external API costs.</p>
+          <div class="recipe-reqs">
+            <span class="recipe-subheading">INPUT REQUIREMENTS</span>
+            <p>Folder containing PDF (.pdf) or image documents.</p>
+          </div>
+          <div class="recipe-ops">
+            <span class="recipe-subheading">OPERATIONS PREVIEW</span>
+            <ul>
+              <li>Extract embedded text or run on-device OCR</li>
+              <li>Detect dates, total amounts, and tax lines</li>
+              <li>Organize files into categorized accounting folders</li>
+            </ul>
+          </div>
+          <div class="recipe-action">
+            <button class="button" disabled style="width: 100%;">Feature in Development · v0.2</button>
+          </div>
+        </article>
+      </div>
+      <div class="section-head">
         <div>
           <div class="eyebrow">DRY-RUN EXECUTION SUMMARY</div>
           <h3>Recipe Results</h3>
@@ -142,19 +197,38 @@
         <button class="button primary" data-go="workspace">Open workspace ↘</button>
       </div>
     </section>
-    <section id="ai" class="view">
+    <section id="activity" class="view">
       <div class="section-head">
         <div>
-          <div class="eyebrow">05 / LOCAL INFERENCE & RUNTIME CONTROL</div>
-          <h2>AI Control Center</h2>
+          <div class="eyebrow">05 / EVIDENCE + CONTROL</div>
+          <h2>Activity & Settings</h2>
         </div>
         <div class="header-actions">
           <span id="aiHeaderBadge" class="status">Checking provider…</span>
           <button id="recheckAiBtn" class="button">Check connection now ↻</button>
         </div>
       </div>
-      <p class="lede" style="font-size: 15px; margin-bottom: 24px;">Monitor Ollama daemon reachability, local model availability, verification proofs, and deterministic fallback status without cloud exposure.</p>
-
+      <div class="settings-grid">
+        <article class="panel">
+          <div class="eyebrow">RUNTIME ENVIRONMENT</div>
+          <h3>Model Connection</h3>
+          <p id="settingsHealth">Checking Ollama…</p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="refreshHealth" class="button">Refresh connection</button>
+          </div>
+        </article>
+        <article class="panel">
+          <div class="eyebrow">SAFETY POLICY</div>
+          <h3>Privacy Boundary</h3>
+          <p>Local mode reads only an authorized path. Hosted mode strictly rejects filesystem operations to protect the server host.</p>
+        </article>
+      </div>
+      <div class="section-head" style="margin-top: 16px;" id="aiRuntimeSection">
+        <div>
+          <div class="eyebrow">LOCAL INFERENCE & RUNTIME CONTROL</div>
+          <h3>AI Runtime & Provider Diagnostics</h3>
+        </div>
+      </div>
       <div class="ai-grid">
         <article class="panel ai-card">
           <div class="eyebrow">OLLAMA DAEMON</div>
@@ -177,7 +251,6 @@
           <p id="aiCardVerificationDetail">Evaluating session execution evidence.</p>
         </article>
       </div>
-
       <div class="ai-meta-grid">
         <article class="panel">
           <div class="eyebrow">LATEST WORKFLOW ENGINE</div>
@@ -192,7 +265,6 @@
           </div>
         </article>
       </div>
-
       <article class="panel ai-setup-panel" id="aiSetupPanel">
         <div class="eyebrow">SETUP GUIDANCE · LOCAL OPEN-WEIGHT AI</div>
         <h3 style="font-size: 22px; margin: 0 0 10px;">Enabling Gemma 3 with Ollama</h3>
@@ -217,32 +289,8 @@
           <strong>✦ Resilient Fallback:</strong> If Ollama is offline, unreachable, or missing the configured model, SlothDesk AI continues running seamlessly using deterministic TypeScript parsing and regex extraction.
         </div>
       </article>
-    </section>
-    <section id="activity" class="view">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow">06 / EVIDENCE + CONTROL</div>
-          <h2>Activity & Settings</h2>
-        </div>
-      </div>
-      <div class="settings-grid">
-        <article class="panel">
-          <div class="eyebrow">RUNTIME ENVIRONMENT</div>
-          <h3>Model Connection</h3>
-          <p id="settingsHealth">Checking Ollama…</p>
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button id="refreshHealth" class="button">Refresh connection</button>
-            <button class="button primary" data-go="ai">Open AI Control Center ↘</button>
-          </div>
-        </article>
-        <article class="panel">
-          <div class="eyebrow">SAFETY POLICY</div>
-          <h3>Privacy Boundary</h3>
-          <p>Local mode reads only an authorized path. Hosted mode strictly rejects filesystem operations to protect the server host.</p>
-        </article>
-      </div>
       <div id="inspectorContainer" class="inspector-wrapper" style="display: none; margin-top: 28px;"></div>
-      <h3 style="font-size: 22px; letter-spacing: -0.02em; margin: 32px 0 16px;">Execution History</h3>
+      <h3 style="font-size: 22px; letter-spacing: -0.02em; margin: 36px 0 16px;">Execution History</h3>
       <div id="history" class="history"></div>
     </section>
   </main>
@@ -276,10 +324,12 @@
     };
     const menuToggle = $('menuToggle');
     const tabsWrapper = $('tabsWrapper');
+    const menuBackdrop = $('menuBackdrop');
     function closeMenu() {
       if (!menuToggle || !tabsWrapper) return;
       menuToggle.setAttribute('aria-expanded', 'false');
       tabsWrapper.classList.remove('open');
+      document.body.classList.remove('menu-open');
       const icon = menuToggle.querySelector('.menu-toggle-icon');
       if (icon) icon.textContent = '☰';
     }
@@ -288,17 +338,28 @@
       const isOpen = tabsWrapper.classList.contains('open');
       menuToggle.setAttribute('aria-expanded', String(!isOpen));
       tabsWrapper.classList.toggle('open', !isOpen);
+      document.body.classList.toggle('menu-open', !isOpen);
       const icon = menuToggle.querySelector('.menu-toggle-icon');
       if (icon) icon.textContent = !isOpen ? '✕' : '☰';
     }
     if (menuToggle) menuToggle.onclick = toggleMenu;
+    if (menuBackdrop) menuBackdrop.onclick = closeMenu;
     function show(view) {
+      if (view === 'ai') {
+        view = 'activity';
+        setTimeout(() => {
+          const aiSec = $('aiRuntimeSection');
+          if (aiSec) aiSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
       document.querySelectorAll('.view').forEach(x => x.classList.toggle('active', x.id === view));
       document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.view === view));
       location.hash = view;
       closeMenu();
-      if (view === 'ai') loadAiStatus();
-      if (view === 'activity' || view === 'dashboard') loadHistory();
+      if (view === 'activity' || view === 'dashboard') {
+        loadHistory();
+        loadAiStatus();
+      }
       if (view === 'review') renderReview();
       if (view === 'studio') loadRecipes();
       if (view === 'csv') renderCsvLab();
@@ -322,13 +383,11 @@
         btn.textContent = 'Checking…';
       }
       if (badge) badge.textContent = 'Checking provider…';
-
       try {
         const data = forcePost
           ? await api('/api/health', { method: 'POST' })
           : await api('/api/health');
         const m = data.model;
-
         const dot = $('modeDot');
         const modeText = $('modeText');
         if (dot && modeText) {
@@ -338,50 +397,43 @@
             modeText.textContent = `LOCAL-FIRST · ${m.model} VERIFIED`;
           } else if (m.available) {
             dot.classList.add('standby');
-            modeText.textContent = 'LOCAL-FIRST · MODEL DETECTED (STANDBY)';
+            modeText.textContent = `LOCAL-FIRST · ${m.model} STANDBY`;
           } else {
             dot.classList.add('fallback');
-            modeText.textContent = 'LOCAL-FIRST · DETERMINISTIC FALLBACK';
+            modeText.textContent = 'FALLBACK · DETERMINISTIC ENGINE';
           }
         }
-
         const modelBadge = $('modelBadge');
         if (modelBadge) {
-          if (m.inferenceVerified) {
-            modelBadge.textContent = `VERIFIED · ${m.model}`;
-          } else if (m.available) {
-            modelBadge.textContent = `STANDBY · ${m.model} detected (unverified)`;
-          } else {
-            modelBadge.textContent = 'FALLBACK · Deterministic local analysis';
-          }
+          modelBadge.textContent = m.inferenceVerified
+            ? `VERIFIED · ${m.model}`
+            : m.available
+            ? `STANDBY · ${m.model}`
+            : 'FALLBACK · Deterministic Engine';
         }
-
         const settingsHealth = $('settingsHealth');
         if (settingsHealth) {
-          settingsHealth.textContent = m.inferenceVerified
-            ? `Verified: ${m.model} is active and verified by live inference.`
-            : (m.available ? `Standby: ${m.model} is installed in Ollama (unverified).` : m.message);
+          settingsHealth.textContent = m.available
+            ? `Connected to Ollama · model "${m.model}" is available on host.`
+            : m.connected
+            ? `Ollama online, but model "${m.model}" is not pulled. Deterministic fallback active.`
+            : 'Ollama is offline or unreachable. Deterministic fallback active.';
         }
-
         if (badge) {
-          if (m.inferenceVerified) {
-            badge.textContent = `VERIFIED · ${m.model}`;
-          } else if (m.available) {
-            badge.textContent = `STANDBY · ${m.model} DETECTED`;
-          } else {
-            badge.textContent = 'FALLBACK · DETERMINISTIC ACTIVE';
-          }
+          badge.textContent = m.inferenceVerified
+            ? 'VERIFIED · OPEN-WEIGHT INFERENCE'
+            : m.available
+            ? 'STANDBY · MODEL DETECTED'
+            : 'FALLBACK · DETERMINISTIC HEURISTIC';
         }
-
         const cardModel = $('aiCardModel');
-        if (cardModel) cardModel.textContent = m.model || 'gemma3:4b';
         const cardModelDetail = $('aiCardModelDetail');
-        if (cardModelDetail) {
+        if (cardModel && cardModelDetail) {
+          cardModel.textContent = m.model || 'gemma3:4b';
           cardModelDetail.textContent = m.installed
             ? 'Configured model weights detected on host.'
             : 'Configured model is not installed in Ollama.';
         }
-
         const cardConn = $('aiCardConnection');
         const cardConnDetail = $('aiCardConnectionDetail');
         if (cardConn && cardConnDetail) {
@@ -393,7 +445,6 @@
             cardConnDetail.textContent = 'Local Ollama service could not be reached.';
           }
         }
-
         const cardAvail = $('aiCardAvailable');
         const cardAvailDetail = $('aiCardAvailableDetail');
         if (cardAvail && cardAvailDetail) {
@@ -407,7 +458,6 @@
               : 'Ollama service is offline or unreachable.';
           }
         }
-
         const cardVerif = $('aiCardVerification');
         const cardVerifDetail = $('aiCardVerificationDetail');
         if (cardVerif && cardVerifDetail) {
@@ -422,7 +472,6 @@
             cardVerifDetail.textContent = 'Inference unavailable. Deterministic fallback active.';
           }
         }
-
         const latestEngine = $('aiLatestEngine');
         const latestEngineDesc = $('aiLatestEngineDesc');
         if (latestEngine && latestEngineDesc) {
@@ -437,14 +486,12 @@
             latestEngineDesc.textContent = 'Run a workspace scan to execute your first document analysis.';
           }
         }
-
         const latestTs = $('aiLatestTimestamp');
         if (latestTs) {
           latestTs.textContent = m.lastInferenceAt
             ? `LAST ANALYSIS: ${new Date(m.lastInferenceAt).toLocaleString()}`
             : '';
         }
-
         const diagBox = $('aiDiagnosticsBox');
         if (diagBox) {
           if (m.lastError) {
@@ -498,11 +545,43 @@
         $('dashboardStatus').textContent = `${data.length} execution${data.length === 1 ? '' : 's'} recorded`;
         if (data.length === 0) {
           $('recent').innerHTML = `
-            <div class="card-item" style="grid-column: 1 / -1; text-align: center; padding: 48px 24px;">
-              <div class="empty-icon">✦</div>
-              <h3>Your desk is clear</h3>
-              <p style="margin-bottom: 20px;">No executions have been recorded yet. Enter a workspace folder to inventory files and extract tasks.</p>
-              <button class="button primary" data-go="workspace" onclick="show('workspace')">Open workspace ↘</button>
+            <div class="card-item first-run-panel" style="grid-column: 1 / -1; padding: 32px 24px;">
+              <div class="eyebrow">GETTING STARTED · THREE CALM STEPS</div>
+              <h3 style="font-size: 24px; margin: 0 0 10px;">Welcome to SlothDesk AI</h3>
+              <p style="font-size: 15px; color: var(--ink-muted); margin-bottom: 22px; max-width: 640px;">
+                SlothDesk AI organizes cluttered directories without cloud data exposure or automated deletion. Everything runs locally on your machine with human approval gates.
+              </p>
+              <div class="first-run-steps">
+                <div class="first-run-step">
+                  <span class="step-num">01</span>
+                  <div>
+                    <strong>Authorize Workspace</strong>
+                    <p>Enter an authorized folder path or select the synthetic demo workspace preset.</p>
+                  </div>
+                </div>
+                <div class="first-run-step">
+                  <span class="step-num">02</span>
+                  <div>
+                    <strong>Preview Dry-Run</strong>
+                    <p>Scans notes, extracts tasks and decisions, and detects duplicate files without moving anything.</p>
+                  </div>
+                </div>
+                <div class="first-run-step">
+                  <span class="step-num">03</span>
+                  <div>
+                    <strong>Approve & Rollback</strong>
+                    <p>Authorize proposed changes in the Review Center. Revert any move with one click.</p>
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px;">
+                <button class="button primary" id="btnFirstRunDemo" onclick="$('workspacePath').value = 'demo-workspace'; show('workspace');">
+                  Start with Demo Workspace Preset ↘
+                </button>
+                <button class="button" onclick="show('workspace');">
+                  Enter Custom Workspace Path ↘
+                </button>
+              </div>
             </div>
           `;
           $('history').innerHTML = '<div class="notice">No execution records found. Run a workspace scan to generate execution history.</div>';

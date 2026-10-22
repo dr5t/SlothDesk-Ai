@@ -112,6 +112,7 @@ test("recipes: duplicate-review detects identical files without deleting silentl
 
 test("recipes: organization-preview generates collision-safe proposals without moving files before approval", async () => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "recipe-org-"));
+  process.env.DATA_DIR = path.join(dir, ".data");
   try {
     await fs.writeFile(path.join(dir, "doc1.md"), "# Sprint Planning\nDiscuss roadmap\n");
     await fs.writeFile(path.join(dir, "doc2.md"), "# Architecture Review\nSystem boundaries\n");

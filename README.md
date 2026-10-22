@@ -13,7 +13,7 @@
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-f25c2a.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-%3E%3D20%20LTS-252321.svg?style=flat-square" alt="Node.js: >=20 LTS" /></a>
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.7-252321.svg?style=flat-square" alt="TypeScript: 5.7" /></a>
-  <a href="./src/tests/"><img src="https://img.shields.io/badge/Tests-24%20Passing-success.svg?style=flat-square" alt="Tests: 24 Passing" /></a>
+  <a href="./src/tests/"><img src="https://img.shields.io/badge/Tests-63%20Passing-success.svg?style=flat-square" alt="Tests: 63 Passing" /></a>
   <a href="https://ollama.com"><img src="https://img.shields.io/badge/Model-Gemma%203%3A4b-f25c2a.svg?style=flat-square" alt="Model: Gemma 3:4b" /></a>
   <a href="#security-model"><img src="https://img.shields.io/badge/Architecture-Local--First-252321.svg?style=flat-square" alt="Architecture: Local-First" /></a>
 </p>
@@ -291,6 +291,8 @@ Check the status pill in the SlothDesk AI top navigation bar:
 ## Five-Minute Reproducible Demo
 
 The repository contains a synthetic test directory at `demo-workspace/` containing realistic notes, meeting decisions, an exact duplicate file, and a sample sales dataset.
+
+> **Full Walkthrough & Verification:** See [DEMO.md](DEMO.md) for the complete 9-step verification guide with expected observations and a one-line headless verification script. Read [DEV-ARTICLE-DRAFT.md](DEV-ARTICLE-DRAFT.md) for the Hacktoberfest Week 3 challenge submission.
 
 ### 1. Copy the Demo Workspace
 
