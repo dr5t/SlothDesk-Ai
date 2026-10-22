@@ -65,16 +65,45 @@ export function sanitizeProviderError(error: unknown): string {
   return sanitized.slice(0, 180) || "Provider error occurred";
 }
 
+function matchesModelTag(target: string, candidate?: string): boolean {
+  if (!candidate || typeof candidate !== "string") return false;
+  const cleanTarget = target.trim().toLowerCase();
+  const cleanCandidate = candidate.trim().toLowerCase();
+  if (cleanCandidate === cleanTarget) return true;
+  if (cleanCandidate.startsWith(`${cleanTarget}:`)) return true;
+  const candidateWithoutRegistry = cleanCandidate.replace(/^(?:[^/]+\/)+/, "");
+  if (candidateWithoutRegistry === cleanTarget) return true;
+  if (candidateWithoutRegistry.startsWith(`${cleanTarget}:`)) return true;
+  const targetBase = cleanTarget.split(":")[0];
+  const candidateBase = candidateWithoutRegistry.split(":")[0];
+  if (targetBase && candidateBase && targetBase === candidateBase) {
+    if (cleanTarget.endsWith(":latest") || candidateWithoutRegistry.endsWith(":latest")) return true;
+  }
+  return false;
+}
+
+function resolveTimeout(raw?: string | number): number {
+  const parsed = typeof raw === "number" ? raw : Number(raw);
+  if (Number.isFinite(parsed) && parsed >= 10 && parsed <= 300_000) {
+    return parsed;
+  }
+  return 60_000;
+}
+
 export class OllamaProvider implements ModelProvider {
   private inferenceVerified = false;
   private lastUsedProvider?: "ollama" | "deterministic";
   private lastInferenceAt?: string;
   private lastError?: string;
+  private readonly timeoutMs: number;
 
   constructor(
     private readonly baseUrl = process.env.OLLAMA_BASE_URL ?? "http://127.0.0.1:11434",
-    private readonly model = process.env.OLLAMA_MODEL ?? "gemma3:4b"
-  ) {}
+    private readonly model = process.env.OLLAMA_MODEL ?? "gemma3:4b",
+    timeoutMs?: number
+  ) {
+    this.timeoutMs = resolveTimeout(timeoutMs ?? process.env.OLLAMA_TIMEOUT_MS);
+  }
 
   setInferenceState(state: {
     verified?: boolean;
@@ -90,7 +119,9 @@ export class OllamaProvider implements ModelProvider {
 
   async health(): Promise<ProviderHealth> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/tags`, { signal: AbortSignal.timeout(1500) });
+      const response = await fetch(`${this.baseUrl}/api/tags`, {
+        signal: AbortSignal.timeout(Math.min(this.timeoutMs, 2500))
+      });
       if (!response.ok) {
         this.lastError = sanitizeProviderError(`Ollama returned HTTP ${response.status}`);
         return {
@@ -106,14 +137,18 @@ export class OllamaProvider implements ModelProvider {
         };
       }
       const payload = (await response.json()) as { models?: Array<{ name?: string }> };
-      const installed =
-        payload.models?.some((item) => item.name === this.model || item.name?.startsWith(`${this.model}:`)) ?? false;
+      const installed = payload.models?.some((item) => matchesModelTag(this.model, item.name)) ?? false;
+      const message = installed
+        ? (this.inferenceVerified
+            ? "Local model is ready and inference verified."
+            : "Local model is installed and ready for inference.")
+        : `Ollama is running, but ${this.model} is not installed.`;
       return {
         available: installed,
         connected: true,
         installed,
         model: this.model,
-        message: installed ? "Local model is ready." : `Ollama is running, but ${this.model} is not installed.`,
+        message,
         inferenceVerified: this.inferenceVerified,
         lastUsedProvider: this.lastUsedProvider,
         lastInferenceAt: this.lastInferenceAt,
@@ -151,7 +186,7 @@ export class OllamaProvider implements ModelProvider {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ model: this.model, prompt, stream: false, format: "json" }),
-        signal: AbortSignal.timeout(20_000)
+        signal: AbortSignal.timeout(this.timeoutMs)
       });
       if (!response.ok) throw new Error(`Ollama returned HTTP ${response.status}`);
       const payload = (await response.json()) as { response?: string };
@@ -180,6 +215,7 @@ export class OllamaProvider implements ModelProvider {
       };
     } catch (err) {
       this.lastError = sanitizeProviderError(err);
+      this.inferenceVerified = false;
       this.lastUsedProvider = "deterministic";
       this.lastInferenceAt = new Date().toISOString();
       return fallbackReport(source, text);

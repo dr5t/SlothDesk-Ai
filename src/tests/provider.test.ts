@@ -224,3 +224,144 @@ test("provider: grounded source evidence matches lines in analyzed text", async 
   assert.ok(taskEvidence);
   assert.equal(taskEvidence.line, 2);
 });
+
+test("provider: health recognizes normalized model tags and registry prefixes", async () => {
+  const { server, url } = await createMockOllama((req, res) => {
+    if (req.url === "/api/tags") {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ models: [{ name: "registry.ollama.ai/library/gemma3:4b" }] }));
+      return;
+    }
+    res.writeHead(404);
+    res.end();
+  });
+
+  try {
+    const provider = new OllamaProvider(url, "gemma3:4b");
+    const health = await provider.health();
+    assert.equal(health.connected, true);
+    assert.equal(health.installed, true);
+    assert.equal(health.available, true);
+    assert.equal(health.inferenceVerified, false);
+    assert.match(health.message, /ready/i);
+  } finally {
+    server.close();
+  }
+});
+
+test("provider: analyze times out when model inference exceeds timeoutMs and falls back to deterministic", async () => {
+  const { server, url } = await createMockOllama((req, res) => {
+    if (req.url === "/api/tags") {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ models: [{ name: "gemma3:4b" }] }));
+      return;
+    }
+    if (req.url === "/api/generate" && req.method === "POST") {
+      setTimeout(() => {
+        if (!res.writableEnded) {
+          res.writeHead(200, { "content-type": "application/json" });
+          res.end(JSON.stringify({ response: "{}" }));
+        }
+      }, 300);
+      return;
+    }
+    res.writeHead(404);
+    res.end();
+  });
+
+  try {
+    const provider = new OllamaProvider(url, "gemma3:4b", 50);
+    const report = await provider.analyze("task.txt", "TODO: complete adversarial pass\nDeadline: Friday");
+    assert.equal(report.provider, "deterministic");
+    assert.ok(report.tasks.length > 0);
+    const health = await provider.health();
+    assert.equal(health.lastUsedProvider, "deterministic");
+    assert.equal(health.inferenceVerified, false);
+    assert.ok(health.lastError);
+  } finally {
+    server.close();
+  }
+});
+
+test("provider: analyze falls back to deterministic extraction when Ollama returns HTTP 500", async () => {
+  const { server, url } = await createMockOllama((req, res) => {
+    if (req.url === "/api/tags") {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ models: [{ name: "gemma3:4b" }] }));
+      return;
+    }
+    if (req.url === "/api/generate" && req.method === "POST") {
+      res.writeHead(500, { "content-type": "application/json" });
+      res.end(JSON.stringify({ error: "model out of memory" }));
+      return;
+    }
+    res.writeHead(404);
+    res.end();
+  });
+
+  try {
+    const provider = new OllamaProvider(url, "gemma3:4b");
+    const report = await provider.analyze("task.txt", "TODO: handle server error\nDeadline: tomorrow");
+    assert.equal(report.provider, "deterministic");
+    assert.ok(report.tasks.length > 0);
+    const health = await provider.health();
+    assert.equal(health.lastUsedProvider, "deterministic");
+    assert.equal(health.inferenceVerified, false);
+    assert.match(health.lastError ?? "", /500/);
+  } finally {
+    server.close();
+  }
+});
+
+test("provider: analyze falls back to deterministic extraction when schema validation fails", async () => {
+  const { server, url } = await createMockOllama((req, res) => {
+    if (req.url === "/api/tags") {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ models: [{ name: "gemma3:4b" }] }));
+      return;
+    }
+    if (req.url === "/api/generate" && req.method === "POST") {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ response: JSON.stringify({ facts: ["only facts"] }) }));
+      return;
+    }
+    res.writeHead(404);
+    res.end();
+  });
+
+  try {
+    const provider = new OllamaProvider(url, "gemma3:4b");
+    const report = await provider.analyze("task.txt", "TODO: verify schema validation\nDeadline: next week");
+    assert.equal(report.provider, "deterministic");
+    assert.ok(report.tasks.length > 0);
+    const health = await provider.health();
+    assert.equal(health.lastUsedProvider, "deterministic");
+    assert.equal(health.inferenceVerified, false);
+    assert.match(health.lastError ?? "", /Invalid model schema/);
+  } finally {
+    server.close();
+  }
+});
+
+test("provider: timeoutMs respects OLLAMA_TIMEOUT_MS environment variable within safe bounds", async () => {
+  const origEnv = process.env.OLLAMA_TIMEOUT_MS;
+  try {
+    process.env.OLLAMA_TIMEOUT_MS = "45000";
+    const provider = new OllamaProvider("http://127.0.0.1:9999", "gemma3:4b");
+    assert.equal((provider as any).timeoutMs, 45000);
+
+    process.env.OLLAMA_TIMEOUT_MS = "-100";
+    const providerUnderflow = new OllamaProvider("http://127.0.0.1:9999", "gemma3:4b");
+    assert.equal((providerUnderflow as any).timeoutMs, 60000);
+
+    process.env.OLLAMA_TIMEOUT_MS = "999999999";
+    const providerOverflow = new OllamaProvider("http://127.0.0.1:9999", "gemma3:4b");
+    assert.equal((providerOverflow as any).timeoutMs, 60000);
+  } finally {
+    if (origEnv !== undefined) {
+      process.env.OLLAMA_TIMEOUT_MS = origEnv;
+    } else {
+      delete process.env.OLLAMA_TIMEOUT_MS;
+    }
+  }
+});
